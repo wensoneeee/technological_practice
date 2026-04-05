@@ -1,4 +1,4 @@
-package com.technokratos.technological_practice.entity;
+package com.technokratos.bookingservice.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
