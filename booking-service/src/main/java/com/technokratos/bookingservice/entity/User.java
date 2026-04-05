@@ -31,10 +31,6 @@ public class User {
     @Column(length = 500)
     private String avatarUrl;
 
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
     @OneToMany(mappedBy = "host")
     private List<Listing> listings;
 }
