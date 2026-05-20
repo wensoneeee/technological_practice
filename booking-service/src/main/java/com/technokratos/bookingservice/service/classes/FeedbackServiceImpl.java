@@ -1,0 +1,110 @@
+package com.technokratos.bookingservice.service.classes;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.technokratos.bookingservice.dto.dtos.FeedbackDto;
+import com.technokratos.bookingservice.dto.dtos.FeedbackEventDto;
+import com.technokratos.bookingservice.dto.forms.FeedbackForm;
+import com.technokratos.bookingservice.models.Feedback;
+import com.technokratos.bookingservice.models.Event;
+import com.technokratos.bookingservice.models.PurchaseItem;
+import com.technokratos.bookingservice.models.User;
+import com.technokratos.bookingservice.repository.EventRepository;
+import com.technokratos.bookingservice.repository.FeedbackRepository;
+import com.technokratos.bookingservice.repository.PurchaseRepository;
+import com.technokratos.bookingservice.repository.UserRepository;
+import com.technokratos.bookingservice.service.interfaces.FeedbackService;
+import com.technokratos.bookingservice.service.interfaces.LoggingService;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
+@Service
+@RequiredArgsConstructor
+public class FeedbackServiceImpl implements FeedbackService {
+
+    private final FeedbackRepository feedbackRepository;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final PurchaseRepository purchaseRepository;
+    private final LoggingService loggingService;
+
+    @Override
+    public FeedbackDto getFeedbackByUserIdAndEventId(Long userId, Long eventId) {
+        try {
+            if (userId == null || eventId == null) return null;
+
+            return feedbackRepository.findFeedbackByEventFeedback_EventIdAndUserFeedback_UserId(eventId, userId)
+                    .map(FeedbackDto::of)
+                    .orElse(null);
+        } catch (Exception e) {
+            loggingService.log("ERROR", "getFeedbackByUserIdAndEventId", "FeedbackServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void save(FeedbackForm form) {
+        try {
+            User user = userRepository.findById(form.getUserId()).orElseThrow();
+            Event event = eventRepository.findById(form.getEventId()).orElseThrow();
+
+            Feedback feedback = feedbackRepository.findFeedbackByEventFeedback_EventIdAndUserFeedback_UserId(form.getEventId(), form.getUserId())
+                    .orElse(Feedback.builder()
+                            .userFeedback(user)
+                            .eventFeedback(event)
+                            .build());
+
+            feedback.setText(form.getText());
+            feedback.setScore(form.getScore());
+            feedback.setConfirmed(purchaseRepository.didUserBoughtTicket(form.getEventId(), form.getUserId()));
+            feedbackRepository.save(feedback);
+        } catch (IllegalArgumentException e) {
+            loggingService.log("ERROR", "save", "FeedbackServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<FeedbackEventDto> findCommentsByEventId(Long eventId){
+        try {
+            List<Feedback> feedbacks = feedbackRepository.findFeedbacksByEventFeedback_EventId(eventId);
+            return feedbacks.stream().map(feedback -> {
+                return FeedbackEventDto.of(feedback, feedback.getUserFeedback().getName());
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            loggingService.log("ERROR", "findCommentsByEventId", "FeedbackServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void updateWasThere(List<PurchaseItem> purchaseItems, Long userId){
+        try {
+            for (PurchaseItem purchaseItem : purchaseItems) {
+                Optional<Feedback> feedback = feedbackRepository.findFeedbackByEventFeedback_EventIdAndUserFeedback_UserId(purchaseItem.getevent().getEventId(), userId);
+                if (feedback.isPresent()) {
+                    feedback.get().setConfirmed(true);
+                    feedbackRepository.save(feedback.get());
+                }
+            }
+        } catch (Exception e) {
+            loggingService.log("ERROR", "updateWasThere", "FeedbackServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Double getAverageEventScore(Long eventId){
+        Double score = feedbackRepository.findAverageScore(eventId);
+        if (score == null) {
+            return 0.0;
+        }else{
+            return score;
+        }
+    }
+}
