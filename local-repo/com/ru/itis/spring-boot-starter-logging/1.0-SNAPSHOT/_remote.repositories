@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu May 21 11:04:46 MSK 2026
+spring-boot-starter-logging-1.0-SNAPSHOT.jar>=
+spring-boot-starter-logging-1.0-SNAPSHOT.pom>=

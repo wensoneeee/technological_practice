@@ -14,6 +14,7 @@
         <dependency>
             <groupId>com.ru.itis</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
