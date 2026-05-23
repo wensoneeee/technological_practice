@@ -1,7 +1,5 @@
 package com.technokratos.bookingservice.service.classes;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.technokratos.bookingservice.dto.dtos.CartItemDto;
 import com.technokratos.bookingservice.dto.forms.CartItemForm;
 import com.technokratos.bookingservice.models.CartItem;
@@ -11,6 +9,8 @@ import com.technokratos.bookingservice.repository.CartItemRepository;
 import com.technokratos.bookingservice.repository.EventRepository;
 import com.technokratos.bookingservice.repository.UserRepository;
 import com.technokratos.bookingservice.service.interfaces.CartItemService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

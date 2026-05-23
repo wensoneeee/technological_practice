@@ -11,7 +11,6 @@ import com.technokratos.bookingservice.models.User;
 import com.technokratos.bookingservice.repository.ImageRepository;
 import com.technokratos.bookingservice.repository.UserRepository;
 import com.technokratos.bookingservice.service.interfaces.ImageService;
-import com.technokratos.bookingservice.service.interfaces.MailService;
 import com.technokratos.bookingservice.service.interfaces.UserService;
 
 import java.util.List;
@@ -26,8 +25,6 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ImageRepository imageRepository;
     private final ImageService imageService;
-    private final MailService mailService;
-
     @Override
     public UserDto getUserById(Long id) {
         return UserDto.of(userRepository.findById(id).orElse(null));
@@ -68,7 +65,6 @@ public class UserServiceImpl implements UserService {
                 .confirmed("NOT_CONFIRMED")
                 .confirmCode(UUID.randomUUID().toString())
                 .build();
-        mailService.sendMailForConfirm(user.getEmail(), user.getConfirmCode());
         userRepository.save(user);
     }
 
