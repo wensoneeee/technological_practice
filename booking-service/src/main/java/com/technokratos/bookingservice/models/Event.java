@@ -44,7 +44,7 @@ public class Event {
     @JoinColumn(name = "image_id")
     private Image image;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "eventCartItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
 
 

@@ -10,7 +10,6 @@ import com.technokratos.bookingservice.models.Event;
 import com.technokratos.bookingservice.repository.CategoryRepository;
 import com.technokratos.bookingservice.repository.EventRepository;
 import com.technokratos.bookingservice.service.interfaces.CategoryService;
-import com.technokratos.bookingservice.service.interfaces.LoggingService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,63 +20,42 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
-    private final LoggingService loggingService;
 
     @Override
-    public List<CategoryDto> getAllCategories(){
-        try {
-            return categoryRepository.findAll().stream().map(CategoryDto::of).collect(Collectors.toList());
-        } catch (Exception e) {
-            loggingService.log("ERROR", "getAllCategories", "CategoryServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+    public List<CategoryDto> getAllCategories() {
+        return categoryRepository.findAll().stream().map(CategoryDto::of).collect(Collectors.toList());
     }
 
     @Override
-    public CategoryDto getCategoryById(Long id){
-        try {
-            return categoryRepository.findById(id).map(CategoryDto::of).orElseThrow(IllegalArgumentException::new);
-        } catch (IllegalArgumentException e) {
-            loggingService.log("ERROR", "getCategoryById", "CategoryServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+    public CategoryDto getCategoryById(Long id) {
+        return categoryRepository.findById(id).map(CategoryDto::of).orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
-    public void save(CategoryForm categoryForm){
-        try {
-            if(categoryForm.id()!=null){
-                Category category = categoryRepository.findById(categoryForm.id()).get();
-                category.setCategoryDescription(categoryForm.description());
-                category.setCategoryName(categoryForm.name());
-                categoryRepository.save(category);
-            }else{
-                Category category = Category.builder()
-                        .categoryName(categoryForm.name())
-                        .categoryDescription(categoryForm.description())
-                        .build();
-                categoryRepository.save(category);
-            }
-        } catch (Exception e) {
-            loggingService.log("ERROR", "save", "CategoryServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
+    public void save(CategoryForm categoryForm) {
+        if (categoryForm.id() != null) {
+            Category category = categoryRepository.findById(categoryForm.id()).get();
+            category.setCategoryDescription(categoryForm.description());
+            category.setCategoryName(categoryForm.name());
+            categoryRepository.save(category);
+        } else {
+            Category category = Category.builder()
+                    .categoryName(categoryForm.name())
+                    .categoryDescription(categoryForm.description())
+                    .build();
+            categoryRepository.save(category);
         }
     }
 
     @Override
     @Transactional
     public void addEventCategory(Long eventId, Long categoryId) {
-        try {
-            Category category = categoryRepository.findById(categoryId).orElseThrow();
-            Event event = eventRepository.findById(eventId).orElseThrow();
+        Category category = categoryRepository.findById(categoryId).orElseThrow();
+        Event event = eventRepository.findById(eventId).orElseThrow();
 
-            category.getEvents().add(event);
-            event.getCategories().add(category);
+        category.getEvents().add(event);
+        event.getCategories().add(category);
 
-            eventRepository.save(event);
-        } catch (Exception e) {
-            loggingService.log("ERROR", "addEventCategory", "CategoryServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+        eventRepository.save(event);
     }
 }
