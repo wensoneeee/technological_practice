@@ -49,6 +49,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
 //    @Cacheable(value = "topEvents")
+    @Cacheable(value = "topEvents")
     public List<EventDto> findAll() {
         List<Event> events = eventJooqRepository.findTopOrderBySalesForLast7Days();
         List<EventDto> eventDtos = new ArrayList<>();
