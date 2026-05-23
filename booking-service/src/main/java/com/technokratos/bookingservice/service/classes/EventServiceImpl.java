@@ -1,6 +1,7 @@
 package com.technokratos.bookingservice.service.classes;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.technokratos.bookingservice.dto.dtos.EventDto;
 import com.technokratos.bookingservice.dto.forms.EventForm;
@@ -54,6 +55,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Cacheable(value = "topEvents")
     public List<EventDto> findAll() {
         List<Event> events = eventRepository.findTopOrderBySalesForLast7Days();
         List<EventDto> eventDtos = new ArrayList<>();

@@ -1,6 +1,8 @@
 package com.technokratos.bookingservice.service.classes;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.technokratos.bookingservice.dto.dtos.CategoryDto;
@@ -22,6 +24,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final EventRepository eventRepository;
 
     @Override
+    @Cacheable(value = "categories")
     public List<CategoryDto> getAllCategories() {
         return categoryRepository.findAll().stream().map(CategoryDto::of).collect(Collectors.toList());
     }
@@ -32,6 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public void save(CategoryForm categoryForm) {
         if (categoryForm.id() != null) {
             Category category = categoryRepository.findById(categoryForm.id()).get();

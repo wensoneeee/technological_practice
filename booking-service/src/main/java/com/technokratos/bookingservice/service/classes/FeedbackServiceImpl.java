@@ -1,6 +1,8 @@
 package com.technokratos.bookingservice.service.classes;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.technokratos.bookingservice.dto.dtos.FeedbackDto;
@@ -41,6 +43,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "feedbacks", key = "#form.eventId")
     public void save(FeedbackForm form) {
         User user = userRepository.findById(form.getUserId()).orElseThrow();
         Event event = eventRepository.findById(form.getEventId()).orElseThrow();
@@ -58,6 +61,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     @Override
+    @Cacheable(value = "feedbacks", key = "#eventId")
     public List<FeedbackEventDto> findCommentsByEventId(Long eventId) {
         List<Feedback> feedbacks = feedbackRepository.findFeedbacksByEventFeedback_EventId(eventId);
         return feedbacks.stream().map(feedback -> {
