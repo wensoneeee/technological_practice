@@ -11,7 +11,6 @@ import com.technokratos.bookingservice.repository.UserRepository;
 import com.technokratos.bookingservice.service.interfaces.CartItemService;
 import com.technokratos.bookingservice.service.interfaces.EventService;
 import com.technokratos.bookingservice.service.interfaces.FeedbackService;
-import com.technokratos.bookingservice.service.interfaces.LoggingService;
 import com.technokratos.bookingservice.service.interfaces.PurchaseItemService;
 import com.technokratos.bookingservice.service.interfaces.PurchaseService;
 
@@ -28,7 +27,6 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final CartItemService cartItemService;
     private final PurchaseItemService purchaseItemService;
     private final EventService eventService;
-    private final LoggingService loggingService;
     private final FeedbackService feedbackService;
 
     @Override
@@ -39,7 +37,6 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .userPurchase(userRepository.findById(userId).orElseThrow(IllegalArgumentException::new))
                 .build();
 
-        try {
             purchaseRepository.save(purchase);
             cartItemService.emptyCartForPurchase(userId);
             List<PurchaseItem> purchaseItems = purchaseItemService.transferCartItemToPurchaseItem(cartItemRepository.findCartItemsByUserCartItem_UserId(userId), purchase);
@@ -50,10 +47,5 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchase.setTotalPrice(
                     purchaseItems.stream().map(PurchaseItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add)
             );
-        } catch (Exception e) {
-            loggingService.log("ERROR", "purchase", "PurchaseServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
-
     }
 }

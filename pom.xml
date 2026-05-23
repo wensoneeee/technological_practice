@@ -17,6 +17,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>spring-boot-starter-logging</module>
         <module>booking-service</module>
         <module>auth-service</module>
     </modules>
@@ -67,6 +68,18 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencyManagement>
         <dependencies>

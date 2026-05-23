@@ -27,73 +27,54 @@ public class ImageServiceImpl implements ImageService {
     @Value("${storage.path}")
     private String storagePath;
 
-    private final LoggingService loggingService;
+    @Override
+    public Long saveImage(MultipartFile file) {
+        String storageName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Image image = Image.builder()
+                .originalFileName(file.getOriginalFilename())
+                .storageFileName(storageName)
+                .type(file.getContentType())
+                .size(file.getSize())
+                .build();
+
+        try {
+            Files.copy(file.getInputStream(), Path.of(storagePath, storageName));
+        } catch (IOException e) {
+            throw new RuntimeException("не удалось сохранить файл");
+        }
+        imageRepository.save(image);
+        return imageRepository.findImageByStorageFileName(storageName).getImageId();
+    }
 
     @Override
-    public Long saveImage(MultipartFile file){
-        try {
-            String storageName = UUID.randomUUID()+"_"+file.getOriginalFilename();
-            Image image = Image.builder()
-                    .originalFileName(file.getOriginalFilename())
-                    .storageFileName(storageName)
-                    .type(file.getContentType())
-                    .size(file.getSize())
-                    .build();
+    public void writeImageToResponse(Long imageId, HttpServletResponse response) {
+        Image image = imageRepository.findById(imageId).get();
+        response.setContentType(image.getType());
 
-            try{
-                Files.copy(file.getInputStream(), Path.of(storagePath, storageName));
-            }catch (IOException e){
-                throw new RuntimeException("не удалось сохранить файл");
-            }
-            imageRepository.save(image);
-            return imageRepository.findImageByStorageFileName(storageName).getImageId();
-        } catch (RuntimeException e) {
-            loggingService.log("ERROR", "saveImage", "ImageServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
+        try {
+            IOUtils.copy(new FileInputStream(Path.of(storagePath, image.getStorageFileName()).toString()), response.getOutputStream());
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void writeImageToResponse(Long imageId, HttpServletResponse response){
+    public void deleteImage(Long id) {
+        Image image = imageRepository.findById(id).get();
         try {
-            Image image = imageRepository.findById(imageId).get();
-            response.setContentType(image.getType());
-
-            try{
-                IOUtils.copy(new FileInputStream(Path.of(storagePath, image.getStorageFileName()).toString()), response.getOutputStream());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (RuntimeException e) {
-            loggingService.log("ERROR", "writeImageToResponse", "ImageServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void deleteImage(Long id){
-        try {
-            Image image = imageRepository.findById(id).get();
             Files.delete(Path.of(storagePath, image.getStorageFileName()));
-            imageRepository.deleteById(id);
-        } catch (Exception e) {
-            loggingService.log("ERROR", "deleteImage", "ImageServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        imageRepository.deleteById(id);
     }
 
     @Override
-    public void clearImageIfNotBeingUsed(Long imageId){
-        try {
-            if (imageId.equals(1L)) return;
+    public void clearImageIfNotBeingUsed(Long imageId) {
+        if (imageId.equals(1L)) return;
 
-            if (!eventRepository.existsByImage_ImageId(imageId)) {
-                deleteImage(imageId);
-            }
-        } catch (Exception e) {
-            loggingService.log("ERROR", "clearImageIfNotBeingUsed", "ImageServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
+        if (!eventRepository.existsByImage_ImageId(imageId)) {
+            deleteImage(imageId);
         }
     }
 }

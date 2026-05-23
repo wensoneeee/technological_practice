@@ -11,7 +11,6 @@ import com.technokratos.bookingservice.models.User;
 import com.technokratos.bookingservice.repository.ImageRepository;
 import com.technokratos.bookingservice.repository.UserRepository;
 import com.technokratos.bookingservice.service.interfaces.ImageService;
-import com.technokratos.bookingservice.service.interfaces.LoggingService;
 import com.technokratos.bookingservice.service.interfaces.MailService;
 import com.technokratos.bookingservice.service.interfaces.UserService;
 
@@ -28,7 +27,6 @@ public class UserServiceImpl implements UserService {
     private final ImageRepository imageRepository;
     private final ImageService imageService;
     private final MailService mailService;
-    private final LoggingService loggingService;
 
     @Override
     public UserDto getUserById(Long id) {
@@ -37,123 +35,82 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(UserForm user) {
-        try {
-            Optional<User> optionalUser = userRepository.findByEmail(user.email());
-            if (optionalUser.isPresent()) {
-                User userFromDB = optionalUser.get();
-                userFromDB.setName(user.name());
-                userFromDB.setPassword(passwordEncoder.encode(user.password()));
-                userFromDB.setEmail(user.email());
-                userFromDB.setRole(user.role());
-                userRepository.save(userFromDB);
-            }else{
-                User userDb = User.builder()
-                        .email(user.email())
-                        .password(passwordEncoder.encode(user.password()))
-                        .name(user.name())
-                        .role(user.role())
-                        .image(imageRepository.findById(1L).orElse(null))
-                        .confirmed("CONFIRMED")
-                        .confirmCode(UUID.randomUUID().toString())
-                        .build();
-                userRepository.save(userDb);
-            }
-        } catch (Exception e) {
-            loggingService.log("ERROR", "saveUser", "UserServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
+        Optional<User> optionalUser = userRepository.findByEmail(user.email());
+        if (optionalUser.isPresent()) {
+            User userFromDB = optionalUser.get();
+            userFromDB.setName(user.name());
+            userFromDB.setPassword(passwordEncoder.encode(user.password()));
+            userFromDB.setEmail(user.email());
+            userFromDB.setRole(user.role());
+            userRepository.save(userFromDB);
+        } else {
+            User userDb = User.builder()
+                    .email(user.email())
+                    .password(passwordEncoder.encode(user.password()))
+                    .name(user.name())
+                    .role(user.role())
+                    .image(imageRepository.findById(1L).orElse(null))
+                    .confirmed("CONFIRMED")
+                    .confirmCode(UUID.randomUUID().toString())
+                    .build();
+            userRepository.save(userDb);
         }
     }
 
     @Override
     public void createUser(UserForm userForm) {
-        try {
-            User user = User.builder()
-                    .email(userForm.email())
-                    .password(passwordEncoder.encode(userForm.password()))
-                    .name(userForm.name())
-                    .role(Role.USER)
-                    .image(imageRepository.findById(1L).orElse(null))
-                    .confirmed("NOT_CONFIRMED")
-                    .confirmCode(UUID.randomUUID().toString())
-                    .build();
-            mailService.sendMailForConfirm(user.getEmail(), user.getConfirmCode());
-            userRepository.save(user);
-        } catch (Exception e) {
-            loggingService.log("ERROR", "createUser", "UserServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+        User user = User.builder()
+                .email(userForm.email())
+                .password(passwordEncoder.encode(userForm.password()))
+                .name(userForm.name())
+                .role(Role.USER)
+                .image(imageRepository.findById(1L).orElse(null))
+                .confirmed("NOT_CONFIRMED")
+                .confirmCode(UUID.randomUUID().toString())
+                .build();
+        mailService.sendMailForConfirm(user.getEmail(), user.getConfirmCode());
+        userRepository.save(user);
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        try {
-            return UserDto.from(userRepository.findAll());
-        } catch (Exception e) {
-            loggingService.log("ERROR", "getAllUsers", "UserServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+        return UserDto.from(userRepository.findAll());
     }
 
     @Override
-    public UserDto getUserByEmail(String email){
-        try {
-            return UserDto.of(userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new));
-        } catch (Exception e) {
-            loggingService.log("ERROR", "getUserByEmail", "UserServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+    public UserDto getUserByEmail(String email) {
+        return UserDto.of(userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new));
     }
 
     @Override
-    public void changePassword(PasswordForm passwordForm, String email){
-        try {
-            User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
-            user.setPassword(passwordEncoder.encode(passwordForm.newPassword()));
-            userRepository.save(user);
-        } catch (Exception e) {
-            loggingService.log("ERROR", "changePassword", "UserServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+    public void changePassword(PasswordForm passwordForm, String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
+        user.setPassword(passwordEncoder.encode(passwordForm.newPassword()));
+        userRepository.save(user);
     }
 
     @Override
-    public void changeProfileImage(Long imageId, String email){
-        try {
-            User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
-            user.setImage(imageRepository.findById(imageId).orElseThrow(IllegalArgumentException::new));
-            userRepository.save(user);
-        } catch (Exception e) {
-            loggingService.log("ERROR", "changeProfileImage", "UserServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+    public void changeProfileImage(Long imageId, String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
+        user.setImage(imageRepository.findById(imageId).orElseThrow(IllegalArgumentException::new));
+        userRepository.save(user);
     }
 
     @Override
-    public void deleteProfileImage(String email){
-        try {
-            User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
-            Long imageId = user.getImage().getImageId();
-            user.setImage(imageRepository.findById(1L).orElseThrow(IllegalArgumentException::new));
-            imageService.deleteImage(imageId);
-            userRepository.save(user);
-        } catch (Exception e) {
-            loggingService.log("ERROR", "deleteProfileImage", "UserServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+    public void deleteProfileImage(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
+        Long imageId = user.getImage().getImageId();
+        user.setImage(imageRepository.findById(1L).orElseThrow(IllegalArgumentException::new));
+        imageService.deleteImage(imageId);
+        userRepository.save(user);
     }
 
     @Override
-    public void setConfirmed(String code){
-        try {
-            User user = userRepository.findByConfirmCode(code);
-            user.setConfirmed("CONFIRMED");
-            userRepository.save(user);
-        } catch (Exception e) {
-            loggingService.log("ERROR", "setConfirmed", "UserServiceImpl", "метод выбросил исключение: "+e.getMessage(), loggingService.getStackTrace(e));
-            throw new RuntimeException(e);
-        }
+    public void setConfirmed(String code) {
+        User user = userRepository.findByConfirmCode(code);
+        user.setConfirmed("CONFIRMED");
+        userRepository.save(user);
     }
-
 }
 
 
