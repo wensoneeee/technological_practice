@@ -15,10 +15,7 @@ public interface UserMapper {
     UserDto toDto(User user);
 
     @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "password", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "confirmed", ignore = true)
-    @Mapping(target = "confirmCode", ignore = true)
     @Mapping(target = "image", ignore = true)
     @Mapping(target = "cartItems", ignore = true)
     @Mapping(target = "feedbacks", ignore = true)
@@ -26,10 +23,7 @@ public interface UserMapper {
     User toEntity(UserForm form);
 
     @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "password", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "confirmed", ignore = true)
-    @Mapping(target = "confirmCode", ignore = true)
     @Mapping(target = "image", ignore = true)
     @Mapping(target = "cartItems", ignore = true)
     @Mapping(target = "feedbacks", ignore = true)

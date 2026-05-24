@@ -23,9 +23,10 @@ public class SecurityHeaderFilter extends OncePerRequestFilter {
         try {
             String userIdHeader = request.getHeader("X-User-Id");
             String userRoleHeader = request.getHeader("X-User-Role");
+            String role = "USER";
 
             if (userIdHeader != null && !userIdHeader.isBlank()) {
-                String role = (userRoleHeader != null && !userRoleHeader.isBlank()) ? userRoleHeader : "USER";
+                role = (userRoleHeader != null && !userRoleHeader.isBlank()) ? userRoleHeader : "USER";
             }
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -37,5 +38,6 @@ public class SecurityHeaderFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } finally {
             SecurityContextHolder.clearContext();
+        }
     }
 }

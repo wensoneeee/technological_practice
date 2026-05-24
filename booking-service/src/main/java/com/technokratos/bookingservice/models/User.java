@@ -29,8 +29,6 @@ public class User {
     @CreationTimestamp
     private LocalDate creationDate;
 
-    private Role role;
-
     private String confirmed;
     private String confirmCode;
 
