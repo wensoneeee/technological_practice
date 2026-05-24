@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private static final String[] PERMIT_ALL_URLS = {"/auth/**"};
+    private static final String[] PERMIT_ALL_URLS = {"/api/v1/auth/**"};
 
     private final JwtTokenFilter jwtTokenFilter;
 

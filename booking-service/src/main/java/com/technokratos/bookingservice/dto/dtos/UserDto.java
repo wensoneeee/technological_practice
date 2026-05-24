@@ -13,7 +13,6 @@ public class UserDto {
     private Long id;
     private String name;
     private String email;
-    private String role;
     private Long imageId;
 
     public static UserDto of(User user) {
@@ -21,8 +20,6 @@ public class UserDto {
                 .id(user.getUserId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .role(user.getRole().name())
-                .imageId(user.getImage().getImageId())
                 .build();
         return userDto;
     }

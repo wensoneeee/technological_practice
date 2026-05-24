@@ -1,5 +1,6 @@
 package com.technokratos.authservice.service;
 
+import com.technokratos.authservice.client.BookingServiceClient;
 import com.technokratos.authservice.dto.AccountResponse;
 import com.technokratos.authservice.dto.AuthResponse;
 import com.technokratos.authservice.entity.RefreshToken;
@@ -27,11 +28,13 @@ public class AuthService {
     private final JwtAccessTokenProvider jwtAccessTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
+    private final BookingServiceClient bookingServiceClient;
+
     @Value("${jwt.refresh.expiration}")
     private long refreshExpiration;
 
     @Transactional
-    public AuthResponse signUp(String email, String password, String fullName) {
+    public AuthResponse signUp(String email, String password, String name) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Юзер с таким логином уже существует");
         }
@@ -39,10 +42,18 @@ public class AuthService {
         User user = new User();
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setFullName(fullName);
+        user.setName(name);
         user.setRole(Role.USER);
 
         user = userRepository.save(user);
+
+        try {
+            bookingServiceClient.createProfile(user.getEmail(), user.getName());
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось создать профиль в booking-service", e);
+        }
+
+
 
         return generateTokens(user);
     }
