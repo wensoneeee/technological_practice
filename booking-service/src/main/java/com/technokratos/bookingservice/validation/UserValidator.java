@@ -14,16 +14,16 @@ public class UserValidator {
     public Validation validate(UserForm userForm, boolean fromAdminPage) {
         Validation validation = new Validation();
 
-        if(userForm.email()==null || userForm.email().isEmpty()){
+        if(userForm.getEmail()==null || userForm.getEmail().isEmpty()){
             validation.addError("почта не может быть пустой");
         }
-        if(userForm.password()==null || userForm.password().isEmpty() || userForm.password().length()<8){
+        if(userForm.getPassword()==null || userForm.getPassword().isEmpty() || userForm.getPassword().length()<8){
             validation.addError("длина пароля минимум 8 символов");
         }
-        if(userForm.name()==null || userForm.name().isEmpty()){
+        if(userForm.getName()==null || userForm.getName().isEmpty()){
             validation.addError("имя не может быть пустым");
         }
-        if(!fromAdminPage && userRepository.findByEmail(userForm.email()).isPresent()){
+        if(!fromAdminPage && userRepository.findByEmail(userForm.getEmail()).isPresent()){
             validation.addError("такая почта уже существует");
         }
         return validation;

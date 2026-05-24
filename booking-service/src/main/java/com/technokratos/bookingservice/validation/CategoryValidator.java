@@ -9,11 +9,11 @@ public class CategoryValidator {
     public Validation validate(CategoryForm form) {
         Validation result = new Validation();
 
-        if (form.name() == null || form.name().trim().isEmpty()) {
+        if (form.getName() == null || form.getName().trim().isEmpty()) {
             result.addError("Название категории не может быть пустым");
         }
 
-        if (form.description() == null || form.description().trim().isEmpty()) {
+        if (form.getDescription() == null || form.getDescription().trim().isEmpty()) {
             result.addError("Описание категории не может быть пустым");
         }
 

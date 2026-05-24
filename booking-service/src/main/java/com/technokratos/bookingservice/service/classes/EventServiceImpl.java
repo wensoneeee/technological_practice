@@ -33,8 +33,8 @@ public class EventServiceImpl implements EventService {
     public EventDto save(EventForm eventForm) {
         Event event;
 
-        if (eventForm.id() != null && eventRepository.findById(eventForm.id()).isPresent()) {
-            event = eventRepository.findById(eventForm.id()).get();
+        if (eventForm.getId() != null && eventRepository.findById(eventForm.getId()).isPresent()) {
+            event = eventRepository.findById(eventForm.getId()).get();
             eventMapper.updateEventFromForm(eventForm, event);
         } else {
             event = eventMapper.toEntity(eventForm);

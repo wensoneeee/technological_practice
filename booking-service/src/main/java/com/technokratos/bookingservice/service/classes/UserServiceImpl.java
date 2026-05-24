@@ -36,15 +36,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(UserForm user) {
-        Optional<User> optionalUser = userRepository.findByEmail(user.email());
+        Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
         if (optionalUser.isPresent()) {
             User userFromDB = optionalUser.get();
             userMapper.updateUserFromForm(user, userFromDB);
-            userFromDB.setPassword(passwordEncoder.encode(user.password()));
+            userFromDB.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(userFromDB);
         } else {
             User userDb = userMapper.toEntity(user);
-            userDb.setPassword(passwordEncoder.encode(user.password()));
+            userDb.setPassword(passwordEncoder.encode(user.getPassword()));
             userDb.setImage(imageRepository.findById(1L).orElse(null));
             userDb.setConfirmed("CONFIRMED");
             userDb.setConfirmCode(UUID.randomUUID().toString());
@@ -56,9 +56,9 @@ public class UserServiceImpl implements UserService {
     public void createUser(UserForm userForm) {
         User user = userMapper.toEntity(userForm);
         user.setRole(Role.USER);
-        user.setPassword(passwordEncoder.encode(userForm.password()));
+        user.setPassword(passwordEncoder.encode(userForm.getPassword()));
         user.setImage(imageRepository.findById(1L).orElse(null));
-        user.setConfirmed("NOT_CONFIRMED");
+        user.setConfirmed("CONFIRMED");
         user.setConfirmCode(UUID.randomUUID().toString());
         userRepository.save(user);
     }
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(PasswordForm passwordForm, String email) {
         User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
-        user.setPassword(passwordEncoder.encode(passwordForm.newPassword()));
+        user.setPassword(passwordEncoder.encode(passwordForm.getNewPassword()));
         userRepository.save(user);
     }
 

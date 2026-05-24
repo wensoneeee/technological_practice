@@ -1,4 +1,4 @@
-package com.technokratos.authservice.config;
+package com.technokratos.authservice.scheduler;
 
 
 import com.technokratos.authservice.repository.RefreshTokenRepository;
