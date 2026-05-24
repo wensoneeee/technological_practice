@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.service.classes;
 
+import com.technokratos.bookingservice.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,16 +23,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
+    private final CategoryMapper categoryMapper;
 
     @Override
     @Cacheable(value = "categories")
     public List<CategoryDto> getAllCategories() {
-        return categoryRepository.findAll().stream().map(CategoryDto::of).collect(Collectors.toList());
+        return categoryRepository.findAll().stream().map(categoryMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
     public CategoryDto getCategoryById(Long id) {
-        return categoryRepository.findById(id).map(CategoryDto::of).orElseThrow(IllegalArgumentException::new);
+        return categoryRepository.findById(id).map(categoryMapper::toDto).orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
@@ -39,14 +41,10 @@ public class CategoryServiceImpl implements CategoryService {
     public void save(CategoryForm categoryForm) {
         if (categoryForm.id() != null) {
             Category category = categoryRepository.findById(categoryForm.id()).get();
-            category.setCategoryDescription(categoryForm.description());
-            category.setCategoryName(categoryForm.name());
+            categoryMapper.updateCategoryFromForm(categoryForm, category);
             categoryRepository.save(category);
         } else {
-            Category category = Category.builder()
-                    .categoryName(categoryForm.name())
-                    .categoryDescription(categoryForm.description())
-                    .build();
+            Category category = categoryMapper.toEntity(categoryForm);
             categoryRepository.save(category);
         }
     }

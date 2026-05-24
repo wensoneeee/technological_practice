@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.service.classes;
 
+import com.technokratos.bookingservice.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import com.technokratos.bookingservice.service.interfaces.UserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,9 +27,11 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ImageRepository imageRepository;
     private final ImageService imageService;
+    private final UserMapper userMapper;
+
     @Override
     public UserDto getUserById(Long id) {
-        return UserDto.of(userRepository.findById(id).orElse(null));
+        return userMapper.toDto(userRepository.findById(id).orElse(null));
     }
 
     @Override
@@ -35,47 +39,38 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findByEmail(user.email());
         if (optionalUser.isPresent()) {
             User userFromDB = optionalUser.get();
-            userFromDB.setName(user.name());
+            userMapper.updateUserFromForm(user, userFromDB);
             userFromDB.setPassword(passwordEncoder.encode(user.password()));
-            userFromDB.setEmail(user.email());
-            userFromDB.setRole(user.role());
             userRepository.save(userFromDB);
         } else {
-            User userDb = User.builder()
-                    .email(user.email())
-                    .password(passwordEncoder.encode(user.password()))
-                    .name(user.name())
-                    .role(user.role())
-                    .image(imageRepository.findById(1L).orElse(null))
-                    .confirmed("CONFIRMED")
-                    .confirmCode(UUID.randomUUID().toString())
-                    .build();
+            User userDb = userMapper.toEntity(user);
+            userDb.setPassword(passwordEncoder.encode(user.password()));
+            userDb.setImage(imageRepository.findById(1L).orElse(null));
+            userDb.setConfirmed("CONFIRMED");
+            userDb.setConfirmCode(UUID.randomUUID().toString());
             userRepository.save(userDb);
         }
     }
 
     @Override
     public void createUser(UserForm userForm) {
-        User user = User.builder()
-                .email(userForm.email())
-                .password(passwordEncoder.encode(userForm.password()))
-                .name(userForm.name())
-                .role(Role.USER)
-                .image(imageRepository.findById(1L).orElse(null))
-                .confirmed("NOT_CONFIRMED")
-                .confirmCode(UUID.randomUUID().toString())
-                .build();
+        User user = userMapper.toEntity(userForm);
+        user.setRole(Role.USER);
+        user.setPassword(passwordEncoder.encode(userForm.password()));
+        user.setImage(imageRepository.findById(1L).orElse(null));
+        user.setConfirmed("NOT_CONFIRMED");
+        user.setConfirmCode(UUID.randomUUID().toString());
         userRepository.save(user);
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        return UserDto.from(userRepository.findAll());
+        return userRepository.findAll().stream().map(userMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUserByEmail(String email) {
-        return UserDto.of(userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new));
+        return userMapper.toDto(userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new));
     }
 
     @Override

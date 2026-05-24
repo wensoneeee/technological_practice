@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.service.classes;
 
+import com.technokratos.bookingservice.mapper.FeedbackMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,13 +32,14 @@ public class FeedbackServiceImpl implements FeedbackService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final PurchaseRepository purchaseRepository;
+    private final FeedbackMapper feedbackMapper;
 
     @Override
     public FeedbackDto getFeedbackByUserIdAndEventId(Long userId, Long eventId) {
         if (userId == null || eventId == null) return null;
 
         return feedbackRepository.findFeedbackByEventFeedback_EventIdAndUserFeedback_UserId(eventId, userId)
-                .map(FeedbackDto::of)
+                .map(feedbackMapper::toDto)
                 .orElse(null);
     }
 
@@ -48,14 +50,10 @@ public class FeedbackServiceImpl implements FeedbackService {
         User user = userRepository.findById(form.getUserId()).orElseThrow();
         Event event = eventRepository.findById(form.getEventId()).orElseThrow();
 
-        Feedback feedback = feedbackRepository.findFeedbackByEventFeedback_EventIdAndUserFeedback_UserId(form.getEventId(), form.getUserId())
-                .orElse(Feedback.builder()
-                        .userFeedback(user)
-                        .eventFeedback(event)
-                        .build());
+        Feedback feedback = feedbackMapper.toEntity(form);
 
-        feedback.setText(form.getText());
-        feedback.setScore(form.getScore());
+        feedback.setUserFeedback(user);
+        feedback.setEventFeedback(event);
         feedback.setConfirmed(purchaseRepository.didUserBoughtTicket(form.getEventId(), form.getUserId()));
         feedbackRepository.save(feedback);
     }
@@ -63,10 +61,9 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     @Cacheable(value = "feedbacks", key = "#eventId")
     public List<FeedbackEventDto> findCommentsByEventId(Long eventId) {
-        List<Feedback> feedbacks = feedbackRepository.findFeedbacksByEventFeedback_EventId(eventId);
-        return feedbacks.stream().map(feedback -> {
-            return FeedbackEventDto.of(feedback, feedback.getUserFeedback().getName());
-        }).collect(Collectors.toList());
+        return feedbackRepository.findFeedbacksByEventFeedback_EventId(eventId).stream()
+                .map(feedbackMapper::toEventDto)
+                .collect(Collectors.toList());
     }
 
     @Override

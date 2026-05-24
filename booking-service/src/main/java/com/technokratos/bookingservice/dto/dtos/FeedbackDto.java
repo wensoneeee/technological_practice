@@ -15,22 +15,5 @@ public class FeedbackDto {
     private String text;
     private Integer score;
     private Boolean confirmed;
-
-    public static FeedbackDto of(Feedback feedback) {
-        if (feedback == null) {
-            return null;
-        }
-        return FeedbackDto.builder()
-                .userId(feedback.getUserFeedback().getUserId())
-                .eventId(feedback.getEventFeedback().getEventId())
-                .text(feedback.getText())
-                .score(feedback.getScore())
-                .confirmed(feedback.getConfirmed())
-                .build();
-    }
-
-    public static List<FeedbackDto> from(List<Feedback> feedbacks) {
-        return feedbacks.stream().map(FeedbackDto::of).collect(Collectors.toList());
-    }
 }
 

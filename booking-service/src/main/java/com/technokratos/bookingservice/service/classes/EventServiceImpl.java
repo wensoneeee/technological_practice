@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.service.classes;
 
+import com.technokratos.bookingservice.mapper.EventMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final ImageRepository imageRepository;
     private final ImageService imageService;
+    private final EventMapper eventMapper;
 
     @Override
     public EventDto save(EventForm eventForm) {
@@ -33,25 +35,13 @@ public class EventServiceImpl implements EventService {
 
         if (eventForm.id() != null && eventRepository.findById(eventForm.id()).isPresent()) {
             event = eventRepository.findById(eventForm.id()).get();
-            event.setTitle(eventForm.title());
-            event.setDescription(eventForm.description());
-            event.setPrice(eventForm.price());
-            event.setAvailableTickets(eventForm.availableTickets());
-            event.setLocation(eventForm.location());
-            event.setTimestamp(eventForm.date());
+            eventMapper.updateEventFromForm(eventForm, event);
         } else {
-            event = Event.builder()
-                    .title(eventForm.title())
-                    .description(eventForm.description())
-                    .price(eventForm.price())
-                    .availableTickets(eventForm.availableTickets())
-                    .location(eventForm.location())
-                    .timestamp(eventForm.date())
-                    .image(imageRepository.findById(1L).orElseThrow(IllegalArgumentException::new))
-                    .build();
+            event = eventMapper.toEntity(eventForm);
+            event.setImage(imageRepository.findById(1L).orElseThrow(IllegalArgumentException::new));
         }
         eventRepository.save(event);
-        return EventDto.of(event);
+        return eventMapper.toDto(event);
     }
 
     @Override
@@ -61,7 +51,7 @@ public class EventServiceImpl implements EventService {
         List<EventDto> eventDtos = new ArrayList<>();
 
         for (int i = 0; i < events.size(); i++) {
-            EventDto eventDto = EventDto.of(events.get(i));
+            EventDto eventDto = eventMapper.toDto(events.get(i));
             if (i < 3) {
                 eventDto.setInWeeklyTop(true);
             }
@@ -72,7 +62,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDto findById(Long id) {
-        return EventDto.of(eventRepository.findById(id).orElseThrow(IllegalArgumentException::new));
+        return eventMapper.toDto(eventRepository.findById(id).orElseThrow(IllegalArgumentException::new));
     }
 
     @Override
@@ -85,7 +75,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventDto> findByCategory(String categoryName) {
         Category category = categoryRepository.findByCategoryName(categoryName);
-        return eventRepository.findAllByCategories(category).stream().map(EventDto::of).collect(Collectors.toList());
+        return eventRepository.findAllByCategories(category).stream().map(eventMapper::toDto).collect(Collectors.toList());
     }
 
     @Override

@@ -19,24 +19,4 @@ public class EventDto {
     private String availableTickets;
     private String price;
     public boolean inWeeklyTop = false;
-
-
-    public static EventDto of(Event event) {
-        return EventDto.builder()
-                .id(event.getEventId())
-                .title(event.getTitle())
-                .timestamp(String.valueOf(event.getTimestamp()))
-                .description(event.getDescription())
-                .location(event.getLocation())
-                .price(String.valueOf(event.getPrice()))
-                .availableTickets(String.valueOf(event.getAvailableTickets()))
-                .imageId(event.getImage().getImageId())
-                .build();
-    }
-
-    public static List<EventDto> from(List<Event> events){
-        return events.stream()
-                .map(EventDto::of)
-                .collect(Collectors.toList());
-    }
 }

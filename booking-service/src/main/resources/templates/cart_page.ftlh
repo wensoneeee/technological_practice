@@ -8,7 +8,7 @@
         <#if cartItems?? && (cartItems?size > 0)>
             <div class="info-box">
                 <h3>Ваш заказ:</h3>
-                <h5>Итого: ${totalPriceRub} руб. ($${totalPriceUsd})</h5>
+                <h5>Итого: ${totalPriceRub} руб.</h5>
                 <#list cartItems as cartItem>
                     <div class="item-card">
                         <strong>${cartItem.eventName}</strong><br>

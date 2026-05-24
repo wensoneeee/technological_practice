@@ -2,6 +2,7 @@ package com.technokratos.bookingservice.service.classes;
 
 import com.technokratos.bookingservice.dto.dtos.CartItemDto;
 import com.technokratos.bookingservice.dto.forms.CartItemForm;
+import com.technokratos.bookingservice.mapper.CartItemMapper;
 import com.technokratos.bookingservice.models.CartItem;
 import com.technokratos.bookingservice.models.Event;
 import com.technokratos.bookingservice.models.User;
@@ -24,6 +25,7 @@ public class CartItemServiceImpl implements CartItemService {
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final CartItemMapper cartItemMapper;
 
     @Override
     public CartItem save(CartItemForm cartItemForm) {
@@ -37,21 +39,18 @@ public class CartItemServiceImpl implements CartItemService {
             cartItem.setQuantity(cartItemForm.getQuantity());
             cartItem.setPricePerUnit(cartItemForm.getPrice());
         } else {
-            cartItem = CartItem.builder()
-                    .userCartItem(user)
-                    .eventCartItem(event)
-                    .pricePerUnit(cartItemForm.getPrice())
-                    .quantity(cartItemForm.getQuantity())
-                    .build();
+            cartItem = cartItemMapper.toEntity(cartItemForm);
+            cartItem.setUserCartItem(user);
+            cartItem.setEventCartItem(event);
         }
         return cartItemRepository.save(cartItem);
     }
 
     @Override
     public List<CartItemDto> getByUserId(Long userId) {
-        return cartItemRepository.findCartItemsByUserCartItem_UserId(userId).stream().map(cartItem -> {
-            return CartItemDto.of(cartItem, cartItem.getEventCartItem().getTitle());
-        }).collect(Collectors.toList());
+        return cartItemRepository.findCartItemsByUserCartItem_UserId(userId).stream()
+                .map(cartItemMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

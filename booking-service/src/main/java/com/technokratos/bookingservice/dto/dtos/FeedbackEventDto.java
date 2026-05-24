@@ -13,13 +13,4 @@ public class FeedbackEventDto {
     private Integer score;
     private Boolean confirmed;
 
-    public static FeedbackEventDto of(Feedback feedback, String name) {
-        return FeedbackEventDto.builder()
-                .userName(name)
-                .date(String.valueOf(feedback.getCreatedAt()))
-                .comment(feedback.getText())
-                .score(feedback.getScore())
-                .confirmed(feedback.getConfirmed())
-                .build();
-    }
 }
