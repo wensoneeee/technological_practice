@@ -1,7 +1,6 @@
 package com.technokratos.bookingservice.service.classes;
 
 import com.technokratos.bookingservice.mapper.FeedbackMapper;
-import com.technokratos.bookingservice.repository.jooq.PurchaseJooqRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -14,10 +13,10 @@ import com.technokratos.bookingservice.models.Feedback;
 import com.technokratos.bookingservice.models.Event;
 import com.technokratos.bookingservice.models.PurchaseItem;
 import com.technokratos.bookingservice.models.User;
-import com.technokratos.bookingservice.repository.jpa.EventRepository;
-import com.technokratos.bookingservice.repository.jpa.FeedbackRepository;
-import com.technokratos.bookingservice.repository.jpa.PurchaseRepository;
-import com.technokratos.bookingservice.repository.jpa.UserRepository;
+import com.technokratos.bookingservice.repository.EventRepository;
+import com.technokratos.bookingservice.repository.FeedbackRepository;
+import com.technokratos.bookingservice.repository.PurchaseRepository;
+import com.technokratos.bookingservice.repository.UserRepository;
 import com.technokratos.bookingservice.service.interfaces.FeedbackService;
 
 import java.util.List;
@@ -34,7 +33,6 @@ public class FeedbackServiceImpl implements FeedbackService {
     private final EventRepository eventRepository;
     private final PurchaseRepository purchaseRepository;
     private final FeedbackMapper feedbackMapper;
-    private final PurchaseJooqRepository purchaseJooqRepository;
 
     @Override
     public FeedbackDto getFeedbackByUserIdAndEventId(Long userId, Long eventId) {
@@ -56,7 +54,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
         feedback.setUserFeedback(user);
         feedback.setEventFeedback(event);
-        feedback.setConfirmed(purchaseJooqRepository.didUserBoughtTicket(form.getEventId(), form.getUserId()));
+        feedback.setConfirmed(purchaseRepository.didUserBoughtTicket(form.getEventId(), form.getUserId()));
         feedbackRepository.save(feedback);
     }
 
