@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TokenUserDetailsService implements UserDetailsService {
 
-    private final JwtAccessTokenProvider jwtAccessTokenProvider;
     private final UserRepository userRepository;
 
     @Override

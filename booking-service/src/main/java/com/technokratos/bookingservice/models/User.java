@@ -29,9 +29,6 @@ public class User {
     @CreationTimestamp
     private LocalDate creationDate;
 
-    private String confirmed;
-    private String confirmCode;
-
     @ManyToOne
     private Image image;
 
