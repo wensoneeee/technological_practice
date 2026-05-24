@@ -2,10 +2,7 @@ package com.technokratos.authservice.jwt;
 
 import com.technokratos.authservice.dto.AccountResponse;
 import com.technokratos.authservice.entity.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -64,7 +61,7 @@ public class JwtAccessTokenProvider {
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }

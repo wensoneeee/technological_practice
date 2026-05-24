@@ -1,7 +1,10 @@
 package com.technokratos.authservice.controller;
 
 import com.technokratos.authservice.dto.*;
+import com.technokratos.authservice.jwt.JwtAccessTokenProvider;
 import com.technokratos.authservice.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtAccessTokenProvider jwtAccessTokenProvider;
 
     @PostMapping("/sign-up")
     public ResponseEntity<AuthResponse> register(@RequestBody SignUpRequest request) {
@@ -24,9 +28,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        AuthResponse response = authService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
+        AuthResponse authResponse = authService.login(request.getEmail(), request.getPassword());
+
+        Cookie cookie = new Cookie("JWT", authResponse.getAccessToken());
+        cookie.setPath("/"); // Кука будет доступна для всех микросов
+        cookie.setHttpOnly(true); // Защита от кражи токена через JavaScript (XSS)
+        cookie.setMaxAge(24 * 60 * 60);
+        response.addCookie(cookie);
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/refresh")
