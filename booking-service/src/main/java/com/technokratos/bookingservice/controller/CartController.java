@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.technokratos.bookingservice.dto.forms.CartItemForm;
 import com.technokratos.bookingservice.service.interfaces.CartItemService;
-import com.technokratos.bookingservice.service.interfaces.CurrencyRateLoader;
 import com.technokratos.bookingservice.service.interfaces.UserService;
 import com.technokratos.bookingservice.validation.CartItemValidator;
 import com.technokratos.bookingservice.validation.Validation;
