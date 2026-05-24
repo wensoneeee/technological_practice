@@ -23,18 +23,11 @@ public class User {
 
     @Column(unique = true)
     private String email;
-    private String password;
-
-    @CreationTimestamp
-    private LocalDate creationDate;
 
     private Role role;
 
-    private String confirmed;
-    private String confirmCode;
-
-    @ManyToOne
-    private Image image;
+    @CreationTimestamp
+    private LocalDate creationDate;
 
     @OneToMany(mappedBy = "userCartItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
@@ -63,11 +56,7 @@ public class User {
         return new StringBuilder("User(")
                 .append("userId=").append(userId)
                 .append(", name=").append(name)
-                .append(", email=").append(email)
                 .append(", createdDate=").append(creationDate)
-                .append(", role=").append(role)
-                .append(", confirmed=").append(confirmed)
-                .append(", confirmCode=").append(confirmCode)
                 .append(')').toString();
     }
 }

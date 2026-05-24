@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.controller;
 
+import com.technokratos.bookingservice.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,7 +12,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.technokratos.bookingservice.dto.forms.FeedbackForm;
 import com.technokratos.bookingservice.service.interfaces.EventService;
 import com.technokratos.bookingservice.service.interfaces.FeedbackService;
-import com.technokratos.bookingservice.service.interfaces.UserService;
 import com.technokratos.bookingservice.validation.FeedbackValidator;
 import com.technokratos.bookingservice.validation.Validation;
 
@@ -22,8 +22,8 @@ import java.security.Principal;
 public class EventController {
     private final EventService eventService;
     private final FeedbackService feedbackService;
-    private final UserService userService;
     private final FeedbackValidator feedbackValidator;
+    private final UserService userService;
 
     @GetMapping("/event/{event-id}")
     public String getEvent(@PathVariable("event-id") Long eventId, Model model) {
