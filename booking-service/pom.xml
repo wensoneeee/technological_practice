@@ -54,8 +54,6 @@
                     </goals>
                 </execution>
             </executions>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
