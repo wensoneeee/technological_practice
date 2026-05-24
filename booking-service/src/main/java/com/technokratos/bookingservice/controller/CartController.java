@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.technokratos.bookingservice.dto.forms.CartItemForm;
 import com.technokratos.bookingservice.service.interfaces.CartItemService;
-import com.technokratos.bookingservice.service.interfaces.CurrencyRateLoader;
 import com.technokratos.bookingservice.service.interfaces.UserService;
 import com.technokratos.bookingservice.validation.CartItemValidator;
 import com.technokratos.bookingservice.validation.Validation;
@@ -23,7 +22,6 @@ public class CartController {
 
     private final UserService userService;
     private final CartItemService cartItemService;
-    private final CurrencyRateLoader currencyRateLoader;
     private final CartItemValidator cartItemValidator;
 
     @PostMapping("/cart/add")
@@ -46,7 +44,6 @@ public class CartController {
         if(totalPrice!=null) {
             model.addAttribute("cartItems", cartItemService.getByUserId(userId));
             model.addAttribute("totalPriceRub", totalPrice);
-            model.addAttribute("totalPriceUsd", totalPrice.divide(currencyRateLoader.getUsdRate(), 2, BigDecimal.ROUND_HALF_UP));
         }
         return "cart_page";
     }

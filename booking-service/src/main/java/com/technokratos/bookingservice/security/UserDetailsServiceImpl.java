@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.technokratos.bookingservice.models.User;
-import com.technokratos.bookingservice.repository.UserRepository;
+import com.technokratos.bookingservice.repository.jpa.UserRepository;
 
 import java.util.Optional;
 

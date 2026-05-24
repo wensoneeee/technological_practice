@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.technokratos.bookingservice.models.CartItem;
 import com.technokratos.bookingservice.models.Purchase;
 import com.technokratos.bookingservice.models.PurchaseItem;
-import com.technokratos.bookingservice.repository.PurchaseItemRepository;
+import com.technokratos.bookingservice.repository.jpa.PurchaseItemRepository;
 import com.technokratos.bookingservice.service.interfaces.PurchaseItemService;
 
 import java.math.BigDecimal;

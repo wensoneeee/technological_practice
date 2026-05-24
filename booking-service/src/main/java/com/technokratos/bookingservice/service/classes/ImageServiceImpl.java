@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.technokratos.bookingservice.models.Image;
-import com.technokratos.bookingservice.repository.EventRepository;
-import com.technokratos.bookingservice.repository.ImageRepository;
+import com.technokratos.bookingservice.repository.jpa.EventRepository;
+import com.technokratos.bookingservice.repository.jpa.ImageRepository;
 import com.technokratos.bookingservice.service.interfaces.ImageService;
 
 import java.io.FileInputStream;

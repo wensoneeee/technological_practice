@@ -1,4 +1,16 @@
 package com.technokratos.bookingservice.dto.forms;
 
-public record CategoryForm(Long id, String name, String description) {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CategoryForm{
+        Long id;
+        String name;
+        String description;
 }

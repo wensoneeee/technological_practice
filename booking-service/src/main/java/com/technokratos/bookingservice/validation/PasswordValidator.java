@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.technokratos.bookingservice.dto.forms.PasswordForm;
 import com.technokratos.bookingservice.models.User;
-import com.technokratos.bookingservice.repository.UserRepository;
+import com.technokratos.bookingservice.repository.jpa.UserRepository;
 
 @Component
 @RequiredArgsConstructor
@@ -18,20 +18,20 @@ public class PasswordValidator {
         Validation validation = new Validation();
         User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
 
-        if(passwordForm.oldPassword().isEmpty() || passwordForm.newPassword().isEmpty() || passwordForm.confirmPassword().isEmpty()) {
+        if(passwordForm.getOldPassword().isEmpty() || passwordForm.getNewPassword().isEmpty() || passwordForm.getConfirmPassword().isEmpty()) {
             validation.addError("никакое из полей не может быть пустым");
             return validation;
         }
 
 
-        if(passwordForm.oldPassword().equals(passwordForm.newPassword())){
+        if(passwordForm.getOldPassword().equals(passwordForm.getNewPassword())) {
             validation.addError("старый и новые пароли не могут совпадать");
         }
-        else if(passwordEncoder.matches(passwordForm.oldPassword(), user.getPassword())){
+        else if(passwordEncoder.matches(passwordForm.getOldPassword(), user.getPassword())){
 
-            if(passwordForm.newPassword().equals(passwordForm.confirmPassword())){
+            if(passwordForm.getNewPassword().equals(passwordForm.getConfirmPassword())) {
 
-                if(passwordForm.newPassword().length()<8){
+                if(passwordForm.getNewPassword().length()<8){
                     validation.addError("пароль должен быть больше 8 символов!");
                 }
             }else{
