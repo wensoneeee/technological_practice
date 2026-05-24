@@ -1,6 +1,5 @@
 package com.technokratos.bookingservice.controller;
 
-import com.technokratos.bookingservice.filter.UserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.technokratos.bookingservice.dto.forms.CartItemForm;
 import com.technokratos.bookingservice.service.interfaces.CartItemService;
-import com.technokratos.bookingservice.service.interfaces.CurrencyRateLoader;
 import com.technokratos.bookingservice.service.interfaces.UserService;
 import com.technokratos.bookingservice.validation.CartItemValidator;
 import com.technokratos.bookingservice.validation.Validation;
@@ -25,11 +23,10 @@ public class CartController {
     private final UserService userService;
     private final CartItemService cartItemService;
     private final CartItemValidator cartItemValidator;
-    private final UserContext userContext;
 
     @PostMapping("/cart/add")
-    public String addToCart(@ModelAttribute CartItemForm cartItemForm, RedirectAttributes redirectAttributes) {
-        cartItemForm.setUserId(userContext.getUserId());
+    public String addToCart(@ModelAttribute CartItemForm cartItemForm, Principal principal, RedirectAttributes redirectAttributes) {
+        cartItemForm.setUserId(userService.getUserByEmail(principal.getName()).getId());
         Validation validation = cartItemValidator.validate(cartItemForm);
 
         if (validation.hasErrors()) {
@@ -42,7 +39,7 @@ public class CartController {
 
     @GetMapping("/cart")
     public String viewCart(Model model, Principal principal) {
-        Long userId = userContext.getUserId();
+        Long userId = userService.getUserByEmail(principal.getName()).getId();
         BigDecimal totalPrice = cartItemService.getTotalPrice(userId);
         if(totalPrice!=null) {
             model.addAttribute("cartItems", cartItemService.getByUserId(userId));

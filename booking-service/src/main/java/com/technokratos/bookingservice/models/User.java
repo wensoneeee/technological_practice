@@ -24,6 +24,8 @@ public class User {
     @Column(unique = true)
     private String email;
 
+    private Role role;
+
     @CreationTimestamp
     private LocalDate creationDate;
 

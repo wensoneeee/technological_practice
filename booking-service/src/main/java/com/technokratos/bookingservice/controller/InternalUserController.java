@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.controller;
 
+import com.technokratos.bookingservice.models.Role;
 import com.technokratos.bookingservice.models.User;
 import com.technokratos.bookingservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,11 @@ public class InternalUserController {
     private final UserRepository userRepository;
 
     @PostMapping
-    public ResponseEntity<Void> createProfile(@RequestParam("email") String email, @RequestParam("name") String name){
+    public ResponseEntity<Void> createProfile(@RequestParam("email") String email, @RequestParam("name") String name, @RequestParam("role") Role role){
         User user = User.builder()
                 .email(email)
                 .name(name)
+                .role(role)
                 .build();
         userRepository.save(user);
         return ResponseEntity.ok().build();

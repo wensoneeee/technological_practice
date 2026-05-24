@@ -48,7 +48,7 @@ public class AuthService {
         user = userRepository.save(user);
 
         try {
-            bookingServiceClient.createProfile(user.getEmail(), user.getName());
+            bookingServiceClient.createProfile(user.getEmail(), user.getName(), user.getRole());
         } catch (Exception e) {
             throw new RuntimeException("Не удалось создать профиль в booking-service", e);
         }
