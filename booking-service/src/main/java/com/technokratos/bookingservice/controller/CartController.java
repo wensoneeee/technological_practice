@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.controller;
 
+import com.technokratos.bookingservice.filter.UserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,10 +24,11 @@ public class CartController {
     private final UserService userService;
     private final CartItemService cartItemService;
     private final CartItemValidator cartItemValidator;
+    private final UserContext userContext;
 
     @PostMapping("/cart/add")
-    public String addToCart(@ModelAttribute CartItemForm cartItemForm, Principal principal, RedirectAttributes redirectAttributes) {
-        cartItemForm.setUserId(userService.getUserByEmail(principal.getName()).getId());
+    public String addToCart(@ModelAttribute CartItemForm cartItemForm, RedirectAttributes redirectAttributes) {
+        cartItemForm.setUserId(userContext.getUserId());
         Validation validation = cartItemValidator.validate(cartItemForm);
 
         if (validation.hasErrors()) {
@@ -39,7 +41,7 @@ public class CartController {
 
     @GetMapping("/cart")
     public String viewCart(Model model, Principal principal) {
-        Long userId = userService.getUserByEmail(principal.getName()).getId();
+        Long userId = userContext.getUserId();
         BigDecimal totalPrice = cartItemService.getTotalPrice(userId);
         if(totalPrice!=null) {
             model.addAttribute("cartItems", cartItemService.getByUserId(userId));

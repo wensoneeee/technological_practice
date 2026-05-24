@@ -29,6 +29,14 @@ public class User {
     @CreationTimestamp
     private LocalDate creationDate;
 
+    private Role role;
+
+    private String confirmed;
+    private String confirmCode;
+
+    @ManyToOne
+    private Image image;
+
     @OneToMany(mappedBy = "userCartItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
 
