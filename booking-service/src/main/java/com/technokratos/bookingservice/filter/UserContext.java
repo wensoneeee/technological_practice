@@ -19,7 +19,7 @@ public class UserContext {
         return currentUserId.get();
     }
 
-    public static void setUserRole(String role) {
+    public void setUserRole(String role) {
         currentUserRole.set(role);
     }
 
