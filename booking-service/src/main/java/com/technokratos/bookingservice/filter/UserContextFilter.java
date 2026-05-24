@@ -23,11 +23,11 @@ public class UserContextFilter extends OncePerRequestFilter {
             String userIdHeader = request.getHeader("X-User-Id");
             String userRoleHeader = request.getHeader("X-User-Role");
 
-            if (userIdHeader != null & !userIdHeader.isBlank()) {
+            if (userIdHeader != null && !userIdHeader.isBlank()) {
                 userContext.setUserId(Long.valueOf(userIdHeader));
             }
             if (userRoleHeader != null) {
-                UserContext.setUserRole(userRoleHeader);
+                userContext.setUserRole(userRoleHeader);
             }
 
             filterChain.doFilter(request, response);
