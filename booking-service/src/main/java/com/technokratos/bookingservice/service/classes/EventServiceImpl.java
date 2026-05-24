@@ -1,6 +1,8 @@
 package com.technokratos.bookingservice.service.classes;
 
 import com.technokratos.bookingservice.mapper.EventMapper;
+import com.technokratos.bookingservice.repository.jooq.EventJooqRepository;
+import com.technokratos.bookingservice.repository.jooq.PurchaseJooqRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -9,9 +11,9 @@ import com.technokratos.bookingservice.dto.forms.EventForm;
 import com.technokratos.bookingservice.models.Category;
 import com.technokratos.bookingservice.models.Event;
 import com.technokratos.bookingservice.models.PurchaseItem;
-import com.technokratos.bookingservice.repository.CategoryRepository;
-import com.technokratos.bookingservice.repository.EventRepository;
-import com.technokratos.bookingservice.repository.ImageRepository;
+import com.technokratos.bookingservice.repository.jpa.CategoryRepository;
+import com.technokratos.bookingservice.repository.jpa.EventRepository;
+import com.technokratos.bookingservice.repository.jpa.ImageRepository;
 import com.technokratos.bookingservice.service.interfaces.EventService;
 import com.technokratos.bookingservice.service.interfaces.ImageService;
 
@@ -28,6 +30,7 @@ public class EventServiceImpl implements EventService {
     private final ImageRepository imageRepository;
     private final ImageService imageService;
     private final EventMapper eventMapper;
+    private final EventJooqRepository eventJooqRepository;
 
     @Override
     public EventDto save(EventForm eventForm) {
@@ -45,9 +48,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Cacheable(value = "topEvents")
+//    @Cacheable(value = "topEvents")
     public List<EventDto> findAll() {
-        List<Event> events = eventRepository.findTopOrderBySalesForLast7Days();
+        List<Event> events = eventJooqRepository.findTopOrderBySalesForLast7Days();
         List<EventDto> eventDtos = new ArrayList<>();
 
         for (int i = 0; i < events.size(); i++) {

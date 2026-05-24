@@ -3,7 +3,7 @@ package com.technokratos.bookingservice.validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import com.technokratos.bookingservice.dto.forms.UserForm;
-import com.technokratos.bookingservice.repository.UserRepository;
+import com.technokratos.bookingservice.repository.jpa.UserRepository;
 
 @Component
 @RequiredArgsConstructor

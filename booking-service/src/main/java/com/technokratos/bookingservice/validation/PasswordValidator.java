@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.technokratos.bookingservice.dto.forms.PasswordForm;
 import com.technokratos.bookingservice.models.User;
-import com.technokratos.bookingservice.repository.UserRepository;
+import com.technokratos.bookingservice.repository.jpa.UserRepository;
 
 @Component
 @RequiredArgsConstructor
