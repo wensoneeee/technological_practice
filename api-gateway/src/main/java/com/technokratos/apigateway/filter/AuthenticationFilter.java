@@ -9,10 +9,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     private final JwtUtil jwtUtil;
+
+    private static final List<String> OPEN_ENDPOINTS = List.of(
+            "/auth/", "/api/v1/auth/", "/api/v1/auth/login", "/api/v1/auth/sign-up"
+    );
 
     public AuthenticationFilter(JwtUtil jwtUtil) {
         super(Config.class);
@@ -26,34 +32,35 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             ServerHttpRequest request = exchange.getRequest();
             String path = request.getURI().getPath();
 
+            boolean isTokenRequired = OPEN_ENDPOINTS.stream()
+                    .noneMatch(path::contains);
             // пропускаем публ пути, где не нужен токен
-            if (!path.contains("/login") && !path.contains("/register")
-                    && !path.contains("/css/") && !path.contains("/images/")) {
+            if (!isTokenRequired) {
+                return chain.filter(exchange);
+            }
+            String token = extractToken(request);
 
-                String token = extractToken(request);
+            if (token == null) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
 
-                if (token == null) {
-                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                    return exchange.getResponse().setComplete();
-                }
+            try {
+                //парсим JWT и проверяем его подпись через JwtUtil
+                jwtUtil.validateToken(token);
 
-                try {
-                    //парсим JWT и проверяем его подпись через JwtUtil
-                    jwtUtil.validateToken(token);
+                String userId = jwtUtil.extractId(token);
+                String role = jwtUtil.extractRole(token);
 
-                    String userId = jwtUtil.extractId(token);
-                    String role = jwtUtil.extractRole(token);
-
-                    // "подменяем" запрос, добавляя заголовки, которые увидят наши микросервисы
-                    request = exchange.getRequest()
-                            .mutate()
-                            .header("X-User-Id", userId)
-                            .header("X-User-Role", role)
-                            .build();
-                } catch (Exception e) {
-                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                    return exchange.getResponse().setComplete();
-                }
+                // "подменяем" запрос, добавляя заголовки, которые увидят наши микросервисы
+                request = exchange.getRequest()
+                        .mutate()
+                        .header("X-User-Id", userId)
+                        .header("X-User-Role", role)
+                        .build();
+            } catch (Exception e) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
             }
             return chain.filter(exchange.mutate().request(request).build());
         };
@@ -76,4 +83,3 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     public static class Config {
     }
 }
-
