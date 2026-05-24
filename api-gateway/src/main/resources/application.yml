@@ -1,0 +1,23 @@
+server:
+  port: 8080 # порт для гэйтвэй
+
+jwt:
+  secret: "J1puBetMouDpy7#ToTBouMup159753456Mo)l(Ho11odyMatbOb3tomJLu3aCMeLLIaPuk1235569852525555jhg"
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**, /api/v1/auth/**
+
+        - id: booking-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/**
+          filters:
+            - AuthenticationFilter #кастомный фильтр для проверки jwt
