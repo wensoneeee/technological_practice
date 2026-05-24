@@ -25,7 +25,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/internal/**").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/*.css").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(securityHeaderFilter, UsernamePasswordAuthenticationFilter.class);
