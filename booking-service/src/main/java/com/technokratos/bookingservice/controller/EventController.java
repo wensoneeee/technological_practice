@@ -1,6 +1,6 @@
 package com.technokratos.bookingservice.controller;
 
-import com.technokratos.bookingservice.filter.UserContext;
+import com.technokratos.bookingservice.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +12,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.technokratos.bookingservice.dto.forms.FeedbackForm;
 import com.technokratos.bookingservice.service.interfaces.EventService;
 import com.technokratos.bookingservice.service.interfaces.FeedbackService;
-import com.technokratos.bookingservice.service.interfaces.UserService;
 import com.technokratos.bookingservice.validation.FeedbackValidator;
 import com.technokratos.bookingservice.validation.Validation;
 
@@ -24,7 +23,7 @@ public class EventController {
     private final EventService eventService;
     private final FeedbackService feedbackService;
     private final FeedbackValidator feedbackValidator;
-    private final UserContext userContext;
+    private final UserService userService;
 
     @GetMapping("/event/{event-id}")
     public String getEvent(@PathVariable("event-id") Long eventId, Model model) {
@@ -39,8 +38,8 @@ public class EventController {
     }
 
     @PostMapping("/event/{event-id}")
-    public String sendComment(@PathVariable("event-id") Long eventId, @ModelAttribute FeedbackForm feedbackForm, RedirectAttributes redirectAttributes) {
-        feedbackForm.setUserId(userContext.getUserId());
+    public String sendComment(@PathVariable("event-id") Long eventId, @ModelAttribute FeedbackForm feedbackForm, Principal principal, RedirectAttributes redirectAttributes) {
+        feedbackForm.setUserId(userService.getUserByEmail(principal.getName()).getId());
         feedbackForm.setEventId(eventId);
         Validation validation = feedbackValidator.validate(feedbackForm);
 
