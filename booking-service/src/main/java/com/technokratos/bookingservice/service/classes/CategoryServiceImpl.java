@@ -10,8 +10,8 @@ import com.technokratos.bookingservice.dto.dtos.CategoryDto;
 import com.technokratos.bookingservice.dto.forms.CategoryForm;
 import com.technokratos.bookingservice.models.Category;
 import com.technokratos.bookingservice.models.Event;
-import com.technokratos.bookingservice.repository.CategoryRepository;
-import com.technokratos.bookingservice.repository.EventRepository;
+import com.technokratos.bookingservice.repository.jpa.CategoryRepository;
+import com.technokratos.bookingservice.repository.jpa.EventRepository;
 import com.technokratos.bookingservice.service.interfaces.CategoryService;
 
 import java.util.List;

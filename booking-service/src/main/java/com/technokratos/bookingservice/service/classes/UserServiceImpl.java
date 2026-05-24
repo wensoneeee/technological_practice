@@ -9,8 +9,8 @@ import com.technokratos.bookingservice.dto.dtos.UserDto;
 import com.technokratos.bookingservice.dto.forms.UserForm;
 import com.technokratos.bookingservice.models.Role;
 import com.technokratos.bookingservice.models.User;
-import com.technokratos.bookingservice.repository.ImageRepository;
-import com.technokratos.bookingservice.repository.UserRepository;
+import com.technokratos.bookingservice.repository.jpa.ImageRepository;
+import com.technokratos.bookingservice.repository.jpa.UserRepository;
 import com.technokratos.bookingservice.service.interfaces.ImageService;
 import com.technokratos.bookingservice.service.interfaces.UserService;
 
