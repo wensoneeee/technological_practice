@@ -11,4 +11,8 @@ public interface UserService {
     List<UserDto> getAllUsers();
     UserDto getUserById(Long id);
     UserDto getUserByEmail(String email) throws UsernameNotFoundException;
+
+    void changeProfileImage(Long imageId, String email);
+
+    void deleteProfileImage(String email);
 }

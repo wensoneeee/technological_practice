@@ -2,7 +2,7 @@ package com.technokratos.bookingservice.controller;
 
 import com.technokratos.bookingservice.models.Role;
 import com.technokratos.bookingservice.models.User;
-import com.technokratos.bookingservice.repository.UserRepository;
+import com.technokratos.bookingservice.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

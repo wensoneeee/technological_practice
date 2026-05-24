@@ -2,9 +2,7 @@ package com.technokratos.bookingservice.service.classes;
 
 import com.technokratos.bookingservice.mapper.EventMapper;
 import com.technokratos.bookingservice.repository.jooq.EventJooqRepository;
-import com.technokratos.bookingservice.repository.jooq.PurchaseJooqRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.technokratos.bookingservice.dto.dtos.EventDto;
 import com.technokratos.bookingservice.dto.forms.EventForm;
