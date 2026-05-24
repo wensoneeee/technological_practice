@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.service.classes;
 
+import io.minio.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -11,10 +12,7 @@ import com.technokratos.bookingservice.repository.jpa.EventRepository;
 import com.technokratos.bookingservice.repository.jpa.ImageRepository;
 import com.technokratos.bookingservice.service.interfaces.ImageService;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -23,13 +21,15 @@ public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository imageRepository;
     private final EventRepository eventRepository;
+    private final MinioClient minioClient; // Добавляем клиент MinIO
 
-    @Value("${storage.path}")
-    private String storagePath;
+    @Value("${minio.bucket.name}")
+    private String bucketName;
 
     @Override
     public Long saveImage(MultipartFile file) {
         String storageName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+
         Image image = Image.builder()
                 .originalFileName(file.getOriginalFilename())
                 .storageFileName(storageName)
@@ -38,33 +38,63 @@ public class ImageServiceImpl implements ImageService {
                 .build();
 
         try {
-            Files.copy(file.getInputStream(), Path.of(storagePath, storageName));
-        } catch (IOException e) {
-            throw new RuntimeException("не удалось сохранить файл");
+            // Проверяем, существует ли бакет, если нет - создаем
+            boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+            if (!found) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+            }
+
+            // Загружаем файл в MinIO
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(storageName)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось сохранить файл в MinIO", e);
         }
+
         imageRepository.save(image);
         return imageRepository.findImageByStorageFileName(storageName).getImageId();
     }
 
     @Override
     public void writeImageToResponse(Long imageId, HttpServletResponse response) {
-        Image image = imageRepository.findById(imageId).get();
+        Image image = imageRepository.findById(imageId)
+                .orElseThrow(() -> new RuntimeException("Изображение не найдено"));
+
         response.setContentType(image.getType());
 
-        try {
-            IOUtils.copy(new FileInputStream(Path.of(storagePath, image.getStorageFileName()).toString()), response.getOutputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        try (InputStream stream = minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(image.getStorageFileName())
+                        .build())) {
+
+            // Копируем поток из MinIO напрямую в ответ
+            IOUtils.copy(stream, response.getOutputStream());
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при получении файла из MinIO", e);
         }
     }
 
     @Override
     public void deleteImage(Long id) {
-        Image image = imageRepository.findById(id).get();
+        Image image = imageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Изображение не найдено"));
         try {
-            Files.delete(Path.of(storagePath, image.getStorageFileName()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            // Удаляем файл из MinIO
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(image.getStorageFileName())
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при удалении файла из MinIO", e);
         }
         imageRepository.deleteById(id);
     }
