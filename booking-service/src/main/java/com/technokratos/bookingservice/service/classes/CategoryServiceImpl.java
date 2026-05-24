@@ -39,8 +39,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @CacheEvict(value = "categories", allEntries = true)
     public void save(CategoryForm categoryForm) {
-        if (categoryForm.id() != null) {
-            Category category = categoryRepository.findById(categoryForm.id()).get();
+        if (categoryForm.getId() != null) {
+            Category category = categoryRepository.findById(categoryForm.getId()).get();
             categoryMapper.updateCategoryFromForm(categoryForm, category);
             categoryRepository.save(category);
         } else {
