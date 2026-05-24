@@ -59,7 +59,7 @@
                         <driver>org.postgresql.Driver</driver>
                         <url>jdbc:postgresql://localhost:5432/shop_db</url>
                         <user>postgres</user>
-                        <password>admin</password>
+                        <password>dilya2006</password>
                     </jdbc>
                     <generator>
                         <database>

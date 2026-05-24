@@ -18,7 +18,7 @@ public class AuthController {
         AuthResponse response = authService.signUp(
                 request.getEmail(),
                 request.getPassword(),
-                request.getFullName()
+                request.getName()
         );
         return ResponseEntity.ok(response);
     }

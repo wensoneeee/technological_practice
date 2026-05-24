@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,17 +25,12 @@ public class TokenUserAccount implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
         Role role = accountResponse.getRole();
-        List<GrantedAuthority> authorities = new ArrayList<>();
 
-        authorities.add(new SimpleGrantedAuthority("ROLE_%s".formatted(role.name())));
-
-        List<GrantedAuthority> privileges = role.getAuthorities().stream()
-                .map(auth -> new SimpleGrantedAuthority(auth))
-                .collect(Collectors.toList());
-
-        authorities.addAll(privileges);
-
-        return authorities;
+        if (role==null) {
+            return Collections.emptyList();
+        }
+        String roleName = String.format("ROLE_%s", role.name());
+        return Collections.singleton(new SimpleGrantedAuthority(roleName));
     }
 
     @Override
