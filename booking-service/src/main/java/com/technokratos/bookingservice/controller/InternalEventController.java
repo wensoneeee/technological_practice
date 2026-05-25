@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 
 @RestController
-@Tag(name = "Internal Event Controller", description = "Внутренний API для автоматического управления событиями (вызовы от шедулеров и аналитики)")
+@Tag(name = "Internal Event Controller",
+        description = "Внутренний API для автоматического управления событиями (вызовы от шедулеров и аналитики)")
 @RequiredArgsConstructor
 public class InternalEventController {
 

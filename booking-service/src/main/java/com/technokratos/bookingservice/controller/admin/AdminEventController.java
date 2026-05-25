@@ -1,5 +1,9 @@
 package com.technokratos.bookingservice.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +21,8 @@ import com.technokratos.bookingservice.validation.Validation;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "Admin Event UI",
+        description = "Панель админа: Управление каталогом событий")
 public class AdminEventController {
 
     private final EventService eventService;
@@ -24,6 +30,10 @@ public class AdminEventController {
     private final EventValidator eventValidator;
 
     @GetMapping("/admin/event")
+    @Operation(summary = "Страница управления событиями",
+            description = "Отображает список мероприятий и их детали")
+    @ApiResponse(responseCode = "200", description = "Страница успешно загружена",
+            content = @Content(mediaType = "text/html"))
     public String getAdminEvent(@RequestParam(required = false) Long selectedEventId, Model model) {
         model.addAttribute("events", eventService.findAll());
 
@@ -34,6 +44,9 @@ public class AdminEventController {
     }
 
     @PostMapping("/admin/event/save")
+    @Operation(summary = "Создание или обновление события",
+            description = "Сохраняет детали события и его изображение (опционально)")
+    @ApiResponse(responseCode = "302", description = "Событие сохранено или произошла ошибка. Редирект")
     public String createEvent(@ModelAttribute EventForm eventForm, @RequestParam(required = false) MultipartFile file, RedirectAttributes redirectAttributes) {
 
         Validation validation = eventValidator.validate(eventForm);
@@ -58,6 +71,8 @@ public class AdminEventController {
     }
 
     @PostMapping("/admin/event/delete")
+    @Operation(summary = "Удаление события по ID", description = "Полностью удаляет мероприятие из системы")
+    @ApiResponse(responseCode = "302", description = "Событие удалено. Редирект")
     public String deleteEvent(@RequestParam Long id) {
         eventService.delete(id);
         return "redirect:/admin/event";
