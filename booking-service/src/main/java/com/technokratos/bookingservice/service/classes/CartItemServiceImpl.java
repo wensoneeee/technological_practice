@@ -11,6 +11,7 @@ import com.technokratos.bookingservice.repository.jpa.EventRepository;
 import com.technokratos.bookingservice.repository.jpa.UserRepository;
 import com.technokratos.bookingservice.service.interfaces.CartItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ public class CartItemServiceImpl implements CartItemService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final CartItemMapper cartItemMapper;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public CartItem save(CartItemForm cartItemForm) {

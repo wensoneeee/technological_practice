@@ -1,8 +1,12 @@
 package com.technokratos.bookingservice.service.classes;
 
+import com.technokratos.bookingservice.config.RabbitConfig;
+import com.technokratos.bookingservice.dto.event.EventActivityEvent;
 import com.technokratos.bookingservice.mapper.EventMapper;
 import com.technokratos.bookingservice.repository.jooq.EventJooqRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.technokratos.bookingservice.dto.dtos.EventDto;
 import com.technokratos.bookingservice.dto.forms.EventForm;
@@ -15,6 +19,7 @@ import com.technokratos.bookingservice.repository.jpa.ImageRepository;
 import com.technokratos.bookingservice.service.interfaces.EventService;
 import com.technokratos.bookingservice.service.interfaces.ImageService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +34,7 @@ public class EventServiceImpl implements EventService {
     private final ImageService imageService;
     private final EventMapper eventMapper;
     private final EventJooqRepository eventJooqRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public EventDto save(EventForm eventForm) {
@@ -46,7 +52,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-//    @Cacheable(value = "topEvents")
+    @Cacheable(value = "topEvents")
     public List<EventDto> findAll() {
         List<Event> events = eventJooqRepository.findTopOrderBySalesForLast7Days();
         List<EventDto> eventDtos = new ArrayList<>();
@@ -63,7 +69,19 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDto findById(Long id) {
-        return eventMapper.toDto(eventRepository.findById(id).orElseThrow(IllegalArgumentException::new));
+        Event event = eventRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+
+        try{
+            EventActivityEvent eventActivityEvent = EventActivityEvent.builder()
+                    .eventId(id)
+                    .activityType("VIEW")
+                    .build();
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, eventActivityEvent);
+        }catch (Exception e){
+            System.out.println("Не удалось отправить сообщение в Rabbit:"+e.getMessage());
+        }
+
+        return eventMapper.toDto(event);
     }
 
     @Override
@@ -99,5 +117,12 @@ public class EventServiceImpl implements EventService {
         event.setImage(imageRepository.findById(photoId).orElseThrow(IllegalArgumentException::new));
         eventRepository.save(event);
         imageService.clearImageIfNotBeingUsed(oldImageId);
+    }
+
+    @Override
+    public void updateCost(Long eventId, BigDecimal cost){
+        Event event = eventRepository.findById(eventId).orElseThrow(IllegalArgumentException::new);
+        event.setPrice(event.getPrice().add(cost));
+        eventRepository.save(event);
     }
 }

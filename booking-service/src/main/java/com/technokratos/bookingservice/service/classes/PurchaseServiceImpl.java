@@ -1,6 +1,9 @@
 package com.technokratos.bookingservice.service.classes;
 
+import com.technokratos.bookingservice.config.RabbitConfig;
+import com.technokratos.bookingservice.dto.event.EventActivityEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.technokratos.bookingservice.models.Purchase;
@@ -28,6 +31,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseItemService purchaseItemService;
     private final EventService eventService;
     private final FeedbackService feedbackService;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     @Transactional
@@ -37,15 +41,22 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .userPurchase(userRepository.findById(userId).orElseThrow(IllegalArgumentException::new))
                 .build();
 
-            purchaseRepository.save(purchase);
-            cartItemService.emptyCartForPurchase(userId);
-            List<PurchaseItem> purchaseItems = purchaseItemService.transferCartItemToPurchaseItem(cartItemRepository.findCartItemsByUserCartItem_UserId(userId), purchase);
-            cartItemService.deleteAllByUserId(userId);
-            eventService.updateAvailableTickets(purchaseItems);
-            purchaseItemService.saveAll(purchaseItems);
-            feedbackService.updateWasThere(purchaseItems, userId);
-            purchase.setTotalPrice(
-                    purchaseItems.stream().map(PurchaseItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add)
-            );
+        purchaseRepository.save(purchase);
+        cartItemService.emptyCartForPurchase(userId);
+        List<PurchaseItem> purchaseItems = purchaseItemService.transferCartItemToPurchaseItem(cartItemRepository.findCartItemsByUserCartItem_UserId(userId), purchase);
+        cartItemService.deleteAllByUserId(userId);
+        eventService.updateAvailableTickets(purchaseItems);
+        purchaseItemService.saveAll(purchaseItems);
+        feedbackService.updateWasThere(purchaseItems, userId);
+        purchase.setTotalPrice(
+                purchaseItems.stream().map(PurchaseItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        for (PurchaseItem purchaseItem : purchaseItems) {
+            EventActivityEvent purchaseEvent = new EventActivityEvent(purchaseItem.getEvent().getEventId(), "PURCHASE");
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, purchaseEvent);
+        }
+
+
     }
 }
