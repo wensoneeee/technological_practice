@@ -20,6 +20,13 @@ spring:
           predicates:
             - Path=/css/**,/image/**,/js/**
 
+        - id: booking-service-docs
+          uri: http://localhost:8082
+          predicates:
+            - Path=/booking-service/v3/api-docs
+          filters:
+            - RewritePath=/booking-service/v3/api-docs, /v3/api-docs
+
         - id: booking-service-protected
           uri: http://localhost:8082
           predicates:
@@ -27,3 +34,9 @@ spring:
           filters:
             - AuthenticationFilter #кастомный фильтр для проверки jwt
             - RewriteResponseHeader=Location, ^http://localhost:8082(.*), $1
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: Booking Service API
+        url: /booking-service/v3/api-docs

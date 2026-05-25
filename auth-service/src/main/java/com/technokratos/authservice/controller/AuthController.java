@@ -39,20 +39,9 @@ public class AuthController {
         return ResponseEntity.ok(authResponse);
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest request) {
-        AuthResponse response = authService.refresh(request.getRefreshToken());
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestBody RefreshRequest request) {
         authService.logout(request.getRefreshToken());
         return ResponseEntity.ok("Вы успешно вышли из системы");
-    }
-
-    @GetMapping("/validate")
-    public ResponseEntity<AccountResponse> validate(@RequestParam String token) {
-        return ResponseEntity.ok(authService.validateAndGetAccount(token));
     }
 }

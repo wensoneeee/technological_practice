@@ -17,8 +17,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     private final JwtUtil jwtUtil;
 
     private static final List<String> OPEN_ENDPOINTS = List.of(
-            "/auth/", "/api/v1/auth/", "/api/v1/auth/login", "/api/v1/auth/sign-up"
-    );
+            "/auth/", "/api/v1/auth/", "/api/v1/auth/login", "/api/v1/auth/sign-up",
+            "/swagger-ui/", "/booking-service/v3/api-docs", "/webjars/", "/v3/api-docs");
 
     public AuthenticationFilter(JwtUtil jwtUtil) {
         super(Config.class);
@@ -33,7 +33,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             String path = request.getURI().getPath();
 
             boolean isTokenRequired = OPEN_ENDPOINTS.stream()
-                    .noneMatch(path::contains);
+                    .noneMatch(path::startsWith);
             // пропускаем публ пути, где не нужен токен
             if (!isTokenRequired) {
                 return chain.filter(exchange);
