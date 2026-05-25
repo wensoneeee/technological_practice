@@ -18,7 +18,7 @@
                     <a href="/admin">Админ</a>
                 </#if>
                 <form action="/logout" method="post" style="display:inline;">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <input type="hidden" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
                     <button type="submit" class="btn">Выйти</button>
                 </form>
             <#else>

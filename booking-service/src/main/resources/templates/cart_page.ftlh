@@ -17,7 +17,7 @@
                     </div>
                 </#list>
                 <form action="/purchase" method="post">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <input type="hidden" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
                     <input type="submit" value="Оформить покупку" class="btn">
                 </form>
             </div>
