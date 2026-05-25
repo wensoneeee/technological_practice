@@ -26,3 +26,4 @@ spring:
             - Path=/**
           filters:
             - AuthenticationFilter #кастомный фильтр для проверки jwt
+            - RewriteResponseHeader=Location, ^http://localhost:8082(.*), $1
