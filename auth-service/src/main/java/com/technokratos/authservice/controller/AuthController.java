@@ -4,7 +4,10 @@ import com.technokratos.authservice.dto.*;
 import com.technokratos.authservice.jwt.JwtAccessTokenProvider;
 import com.technokratos.authservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,8 +24,15 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/sign-up")
-    @Operation(summary = "Регистрация нового пользователя", description = "Создает аккаунт в системе")
-    @ApiResponse(responseCode = "200", description = "Успешная регистрация")
+    @Operation(
+            summary = "Регистрация нового пользователя",
+            description = "Принимает данные нового аккаунта, создает запись в базе данных и возвращает пару JWT-токенов."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь успешно зарегистрирован",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Некорректные входные данные или email уже занят")
+    })
     public ResponseEntity<AuthResponse> register(@RequestBody SignUpRequest request) {
         AuthResponse response = authService.signUp(
                 request.getEmail(),
@@ -33,8 +43,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Авторизация", description = "Возвращает JWT токен")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
+    @Operation(
+            summary = "Аутентификация (Вход в систему)",
+            description = "Проверяет email и пароль. Возвращает JWT-токены в теле ответа, а также устанавливает Access Token в защищенную куку HttpOnly."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успешный вход в систему",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Неверный логин или пароль")
+    })    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
         AuthResponse authResponse = authService.login(request.getEmail(), request.getPassword());
 
         Cookie cookie = new Cookie("JWT", authResponse.getAccessToken());
@@ -46,8 +63,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "Выход из аккаунта")
-    public ResponseEntity<String> logout(@RequestBody RefreshRequest request) {
+    @Operation(
+            summary = "Выход из системы (Logout)",
+            description = "Удаляет сессию пользователя, инвалидирует его Refresh-токен."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь успешно вышел из системы"),
+            @ApiResponse(responseCode = "400", description = "Передан невалидный или отсутствующий Refresh-токен")
+    })    public ResponseEntity<String> logout(@RequestBody RefreshRequest request) {
         authService.logout(request.getRefreshToken());
         return ResponseEntity.ok("Вы успешно вышли из системы");
     }
