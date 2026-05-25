@@ -50,7 +50,7 @@ public class InternalUserController {
     @PutMapping("/api/v1/internal/feedbacks/{feedbackId}/status")
     @Operation(
             summary = "Изменение статуса модерации отзыва",
-            description = "Внутренний эндпоинт для обновления статуса отзыва (например, после автоматической проверки модератором или сторонним сервисом)."
+            description = "Внутренний эндпоинт для обновления статуса отзыва (например, после автоматической проверки другим сервисом)"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Статус отзыва успешно обновлен"),

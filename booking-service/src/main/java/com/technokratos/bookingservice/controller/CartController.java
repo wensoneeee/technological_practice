@@ -1,5 +1,9 @@
 package com.technokratos.bookingservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +22,7 @@ import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "Web Cart UI", description = "Управление корзиной покупок")
 public class CartController {
 
     private final UserService userService;
@@ -25,6 +30,9 @@ public class CartController {
     private final CartItemValidator cartItemValidator;
 
     @PostMapping("/cart/add")
+    @Operation(summary = "Добавление билета в корзину",
+            description = "Принимает форму добавления и делает редирект на страницу события")
+    @ApiResponse(responseCode = "302", description = "Успешное добавление/ошибка валидации. Редирект")
     public String addToCart(@ModelAttribute CartItemForm cartItemForm, Principal principal, RedirectAttributes redirectAttributes) {
         cartItemForm.setUserId(userService.getUserByEmail(principal.getName()).getId());
         Validation validation = cartItemValidator.validate(cartItemForm);
@@ -38,6 +46,9 @@ public class CartController {
     }
 
     @GetMapping("/cart")
+    @Operation(summary = "Просмотр корзины")
+    @ApiResponse(responseCode = "200", description = "HTML-страница корзины",
+            content = @Content(mediaType = "text/html"))
     public String viewCart(Model model, Principal principal) {
         Long userId = userService.getUserByEmail(principal.getName()).getId();
         BigDecimal totalPrice = cartItemService.getTotalPrice(userId);

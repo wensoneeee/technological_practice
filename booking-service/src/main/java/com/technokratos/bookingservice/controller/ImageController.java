@@ -2,6 +2,10 @@ package com.technokratos.bookingservice.controller;
 
 import com.technokratos.bookingservice.dto.dtos.UserDto;
 import com.technokratos.bookingservice.models.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +26,7 @@ import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "Image Controller", description = "Загрузка, отображение и удаление изображения")
 public class ImageController {
 
     private final ImageService imageService;
@@ -29,11 +34,16 @@ public class ImageController {
     private final ImageValidator imageValidator;
 
     @GetMapping("/image/{imageId}")
+    @Operation(summary = "Получить изображение", description = "Записывает байты картинки напрямую в ответ")
+    @ApiResponse(responseCode = "200", description = "Файл изображения",
+            content = @Content(mediaType = "image/jpeg"))
     public void getImage(@PathVariable Long imageId, HttpServletResponse response) {
         imageService.writeImageToResponse(imageId, response);
     }
 
     @PostMapping("/img/profile/update")
+    @Operation(summary = "Обновить аватар профиля")
+    @ApiResponse(responseCode = "302", description = "Редирект в профиль")
     public String saveProfileImage(@RequestParam("file") MultipartFile file,
                                    @AuthenticationPrincipal String email, RedirectAttributes redirectAttributes) {
         Validation validation = imageValidator.validate(file);
@@ -47,6 +57,8 @@ public class ImageController {
     }
 
     @PostMapping("/img/profile/delete")
+    @Operation(summary = "Удалить аватар профиля")
+    @ApiResponse(responseCode = "302", description = "Редирект в профиль")
     public String deleteProfileImage(@AuthenticationPrincipal String email) {
         userService.deleteProfileImage(email);
         return "redirect:/profile";

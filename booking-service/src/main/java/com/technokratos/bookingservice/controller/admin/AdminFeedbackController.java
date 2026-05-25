@@ -1,5 +1,9 @@
 package com.technokratos.bookingservice.controller.admin;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +22,7 @@ import com.technokratos.bookingservice.validation.Validation;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "Admin Feedback UI", description = "Панель админа: Управление отзывами пользователей")
 public class AdminFeedbackController {
     private final UserService userService;
     private final EventService eventService;
@@ -25,6 +30,10 @@ public class AdminFeedbackController {
     private final FeedbackValidator feedbackValidator;
 
     @GetMapping("/admin/feedback")
+    @Operation(summary = "Страница управления отзывами",
+            description = "Отображает списки пользователей, событий и карточку конкретного отзыва")
+    @ApiResponse(responseCode = "200", description = "Cтраница спешно загружена",
+            content = @Content(mediaType = "text/html"))
     public String adminFeedback(Model model, @RequestParam(required = false) Long selectedEventId, @RequestParam(required = false) Long selectedUserId) {
         model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("events", eventService.findAll());
@@ -40,6 +49,9 @@ public class AdminFeedbackController {
     }
 
     @PostMapping("/admin/feedback/save")
+    @Operation(summary = "Сохранение или изменение отзыва",
+            description = "Можно создать или отредактировать текст/оценку отзыва")
+    @ApiResponse(responseCode = "302", description = "Отзыв успешно обновлен. Редирект")
     public String saveFeedback(@ModelAttribute FeedbackForm feedbackForm, RedirectAttributes redirectAttributes){
         Validation validation = feedbackValidator.validate(feedbackForm);
 

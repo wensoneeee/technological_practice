@@ -1,6 +1,10 @@
 package com.technokratos.bookingservice.controller;
 
 import com.technokratos.bookingservice.service.interfaces.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +23,7 @@ import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "Web Event UI", description = "Отображение страницы события и отправка отзыва")
 public class EventController {
     private final EventService eventService;
     private final FeedbackService feedbackService;
@@ -26,6 +31,9 @@ public class EventController {
     private final UserService userService;
 
     @GetMapping("/event/{event-id}")
+    @Operation(summary = "Страница события по ID", description = "Возвращает страницу с деталями события и отзывами")
+    @ApiResponse(responseCode = "200", description = "страница события",
+            content = @Content(mediaType = "text/html"))
     public String getEvent(@PathVariable("event-id") Long eventId, Model model) {
         try {
             model.addAttribute("event", eventService.findById(eventId));
@@ -38,6 +46,8 @@ public class EventController {
     }
 
     @PostMapping("/event/{event-id}")
+    @Operation(summary = "Отправка отзыва к событию", description = "Сохраняет отзыв и перенаправляет обратно")
+    @ApiResponse(responseCode = "302", description = "Редирект на страницу события")
     public String sendComment(@PathVariable("event-id") Long eventId, @ModelAttribute FeedbackForm feedbackForm, Principal principal, RedirectAttributes redirectAttributes) {
         feedbackForm.setUserId(userService.getUserByEmail(principal.getName()).getId());
         feedbackForm.setEventId(eventId);
@@ -48,7 +58,6 @@ public class EventController {
         }else{
             feedbackService.save(feedbackForm);
         }
-
         return "redirect:/event/" + eventId;
     }
 }
