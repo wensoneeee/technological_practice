@@ -13,7 +13,6 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "event_id"}))
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
