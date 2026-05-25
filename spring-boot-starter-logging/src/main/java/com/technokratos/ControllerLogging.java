@@ -19,7 +19,7 @@ public class ControllerLogging {
         this.properties = properties;
     }
 
-    @Around("@within(org.springframework.stereotype.RestController) || @within(org.springframework.stereotype.Controller)")
+    @Around("@within(org.springframework.stereotype.Controller)")
     public Object logController(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
