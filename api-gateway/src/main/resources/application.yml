@@ -18,7 +18,7 @@ spring:
         - id: booking-service-public
           uri: http://localhost:8082
           predicates:
-            - Path=/css/**, /image/**, /js/**
+            - Path=/css/**,/image/**,/js/**
 
         - id: booking-service-protected
           uri: http://localhost:8082
