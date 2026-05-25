@@ -23,13 +23,21 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue activityQueue() {
-        return new Queue(QUEUE_NAME, true); // durable - переживет ли перезапуск брокера
-    }
+    public Queue activityQueue() { return new Queue("event.activity.queue", true); }
 
     @Bean
-    public Binding binding(Queue activityQueue, TopicExchange activityExchange) {
-        return BindingBuilder.bind(activityQueue).to(activityExchange).with(ROUTING_KEY);
+    public Queue feedbackQueue() { return new Queue("feedback.moderation.queue", true); }
+
+    // Аргументы должны называться ИМЕННО activityQueue и activityExchange
+    @Bean
+    public Binding activityBinding(Queue activityQueue, TopicExchange activityExchange) {
+        return BindingBuilder.bind(activityQueue).to(activityExchange).with("event.activity.click");
+    }
+
+    // Аргументы должны называться ИМЕННО feedbackQueue и feedbackExchange
+    @Bean
+    public Binding feedbackBinding(Queue feedbackQueue, TopicExchange feedbackExchange) {
+        return BindingBuilder.bind(feedbackQueue).to(feedbackExchange).with("feedback.moderation.validate");
     }
 
     @Bean
@@ -41,15 +49,5 @@ public class RabbitConfig {
     @Bean
     public TopicExchange feedbackExchange() {
         return new TopicExchange(FEEDBACK_EXCHANGE);
-    }
-
-    @Bean
-    public Queue feedbackQueue() {
-        return new Queue(FEEDBACK_QUEUE, true);
-    }
-
-    @Bean
-    public Binding feedbackBinding(Queue feedbackQueue, TopicExchange feedbackExchange) {
-        return BindingBuilder.bind(feedbackQueue).to(feedbackExchange).with(FEEDBACK_ROUTING_KEY);
     }
 }

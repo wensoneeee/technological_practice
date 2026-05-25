@@ -68,7 +68,9 @@ public class FeedbackServiceImpl implements FeedbackService {
                     .text(feedback.getText())
                     .build();
 
-            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, fme);
+            rabbitTemplate.convertAndSend("feedback.moderation.exchange",
+                    "feedback.moderation.validate",
+                    fme);
         } catch (Exception e) {
             System.err.println("Ошибка отправки отзыва в брокер: " + e.getMessage());
         }
@@ -82,16 +84,6 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void updateWasThere(List<PurchaseItem> purchaseItems, Long userId) {
-        for (PurchaseItem purchaseItem : purchaseItems) {
-            Optional<Feedback> feedback = feedbackRepository.findFeedbackByEventFeedback_EventIdAndUserFeedback_UserId(purchaseItem.getEvent().getEventId(), userId);
-            if (feedback.isPresent()) {
-                feedback.get().setConfirmed(true);
-                feedbackRepository.save(feedback.get());
-            }
-        }
-    }
 
     @Override
     public Double getAverageEventScore(Long eventId) {
