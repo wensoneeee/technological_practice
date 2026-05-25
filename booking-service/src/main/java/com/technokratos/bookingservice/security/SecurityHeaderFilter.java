@@ -1,5 +1,6 @@
 package com.technokratos.bookingservice.security;
 
+import com.technokratos.bookingservice.models.Role;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,10 +24,10 @@ public class SecurityHeaderFilter extends OncePerRequestFilter {
         try {
             String userIdHeader = request.getHeader("X-User-Id");
             String userRoleHeader = request.getHeader("X-User-Role");
-            String role = "USER";
+            String role = Role.ROLE_USER.name();
 
             if (userIdHeader != null && !userIdHeader.isBlank()) {
-                role = (userRoleHeader != null && !userRoleHeader.isBlank()) ? userRoleHeader : "USER";
+                role = (userRoleHeader != null && !userRoleHeader.isBlank()) ? userRoleHeader : role;
             }
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

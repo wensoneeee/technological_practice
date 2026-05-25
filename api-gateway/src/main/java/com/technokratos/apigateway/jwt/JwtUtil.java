@@ -24,13 +24,15 @@ public class JwtUtil {
     public String extractId(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build()
                 .parseClaimsJws(token).getBody();
-        return claims.get("id", String.class);
+        Object id = claims.get("id");
+        return id != null ? id.toString() : null;
     }
 
     public String extractRole(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build()
                 .parseClaimsJws(token).getBody();
-        return claims.get("role", String.class);
+        Object role = claims.get("role");
+        return role != null ? role.toString() : null;
     }
 
     private Key getSignKey() {
