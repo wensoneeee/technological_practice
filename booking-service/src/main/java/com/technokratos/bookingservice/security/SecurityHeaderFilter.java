@@ -5,7 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,13 +20,15 @@ public class SecurityHeaderFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
-        try {
-            String userIdHeader = request.getHeader("X-User-Id");
-            String userRoleHeader = request.getHeader("X-User-Role");
-            String role = Role.ROLE_USER.name();
 
-            if (userIdHeader != null && !userIdHeader.isBlank()) {
-                role = (userRoleHeader != null && !userRoleHeader.isBlank()) ? userRoleHeader : role;
+        String userIdHeader = request.getHeader("X-User-Id");
+        String userRoleHeader = request.getHeader("X-User-Role");
+
+        if (userIdHeader != null && !userIdHeader.isBlank()) {
+            String role = (userRoleHeader != null && !userRoleHeader.isBlank()) ? userRoleHeader : Role.ROLE_USER.name();
+
+            if (!role.startsWith("ROLE_")) {
+                role = "ROLE_" + role;
             }
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -35,10 +36,8 @@ public class SecurityHeaderFilter extends OncePerRequestFilter {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            filterChain.doFilter(request, response);
-        } finally {
-            SecurityContextHolder.clearContext();
         }
+
+        filterChain.doFilter(request, response);
     }
 }
