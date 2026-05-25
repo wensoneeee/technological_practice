@@ -14,7 +14,7 @@
             <a href="/cart">Корзина</a>
             <a href="/profile">Профиль</a>
             <#if userRole??>
-                <#if userRole == 'ADMIN'>
+                <#if userRole == 'ROLE_ADMIN'>
                     <a href="/admin">Админ</a>
                 </#if>
                 <form action="/logout" method="post" style="display:inline;">
