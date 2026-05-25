@@ -29,8 +29,7 @@ public class TokenUserAccount implements UserDetails {
         if (role==null) {
             return Collections.emptyList();
         }
-        String roleName = String.format("ROLE_%s", role.name());
-        return Collections.singleton(new SimpleGrantedAuthority(roleName));
+        return Collections.singleton(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
