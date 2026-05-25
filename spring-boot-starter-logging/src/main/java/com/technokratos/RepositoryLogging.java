@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 @Aspect
 public class RepositoryLogging {
-    private static final Logger logger = LoggerFactory.getLogger("logging");
+    private static final Logger log = LoggerFactory.getLogger("logging");
 
     private final LoggingProperties properties;
 
@@ -19,16 +19,22 @@ public class RepositoryLogging {
         this.properties = properties;
     }
 
-
-    @Around("execution(* com..technokratos..*Repository.*(..))")
+    @Around("within(@Repository *) || within(org.springframework.data.repository.Repository+)")
     public Object logRepository(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.currentTimeMillis();
-        Object result = joinPoint.proceed();
-        long duration = System.currentTimeMillis() - start;
-        logger.debug("{} {} --- {} {} : Parameters = {} and result = {} {}ms", Instant.now(), "DEBUG",
-                properties.getModule(), joinPoint.getSignature().getDeclaringTypeName(),
-                Arrays.toString(joinPoint.getArgs()), result, duration);
-        return result;
-    }
+        String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
+        String methodName = joinPoint.getSignature().getName();
 
+        long start = System.currentTimeMillis();
+        try {
+            Object result = joinPoint.proceed();
+            long executionTime = System.currentTimeMillis() - start;
+
+            log.debug("[REPO] {}.{}() - Успех ({} мс)", className, methodName, executionTime);
+            return result;
+        } catch (Exception e) {
+            long executionTime = System.currentTimeMillis() - start;
+            log.error("[REPO] {}.{}() - ОШИБКА БД ({} мс). Причина: {}", className, methodName, executionTime, e.getMessage());
+            throw e;
+        }
+    }
 }

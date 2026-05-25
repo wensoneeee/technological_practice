@@ -21,7 +21,7 @@ public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository imageRepository;
     private final EventRepository eventRepository;
-    private final MinioClient minioClient; // Добавляем клиент MinIO
+    private final MinioClient minioClient;
 
     @Value("${minio.bucket.name}")
     private String bucketName;
@@ -38,13 +38,11 @@ public class ImageServiceImpl implements ImageService {
                 .build();
 
         try {
-            // Проверяем, существует ли бакет, если нет - создаем
             boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!found) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             }
 
-            // Загружаем файл в MinIO
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(bucketName)
@@ -74,7 +72,6 @@ public class ImageServiceImpl implements ImageService {
                         .object(image.getStorageFileName())
                         .build())) {
 
-            // Копируем поток из MinIO напрямую в ответ
             IOUtils.copy(stream, response.getOutputStream());
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при получении файла из MinIO", e);
