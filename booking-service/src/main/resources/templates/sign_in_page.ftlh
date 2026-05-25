@@ -9,7 +9,7 @@
 <div class="auth-card">
     <h2>Вход</h2>
     <form action="/login" method="post">
-        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+        <input type="hidden" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
         <input name="email" type="email" class="auth-input" placeholder="Email" required>
         <input name="password" type="password" class="auth-input" placeholder="Пароль" required>
 

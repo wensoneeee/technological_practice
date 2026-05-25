@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserByEmail(String email) {
-        System.out.println(email);
         return userMapper.toDto(userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new));
     }
 

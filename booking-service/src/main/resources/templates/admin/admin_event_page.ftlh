@@ -3,7 +3,7 @@
     <h3>Создать/изменить мероприятие</h3>
 
     <form action="/admin/event" method="get" class="info-box flex-row">
-        <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+        <input type="hidden" id="csrf" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
         <select name="selectedEventId" class="form-control">
             <option value="">--создать новый--</option>
             <#list events as e>
@@ -14,7 +14,7 @@
     </form>
 
     <form action="/admin/event/save" method="post" enctype="multipart/form-data" class="item-card">
-        <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+        <input type="hidden" id="csrf" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
         <input type="hidden" name="id" value="${(selectedEvent.id)!''}">
         <div class="form-group"><input type="text" name="title" class="form-control" placeholder="название" value="${(selectedEvent.title)!''}" required></div>
         <div class="form-group"><input type="text" name="description" class="form-control" placeholder="описание" value="${(selectedEvent.description)!''}" required></div>
@@ -28,7 +28,7 @@
 
     <#if selectedEvent??>
         <form action="/admin/event/delete" method="post" class="mt-20">
-            <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+            <input type="hidden" id="csrf" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
             <input type="hidden" name="id" value="${selectedEvent.id}">
             <input type="submit" value="удалить" class="btn" style="background-color: #ef4444;">
         </form>
