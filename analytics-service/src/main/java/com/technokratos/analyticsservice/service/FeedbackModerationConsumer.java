@@ -1,11 +1,10 @@
 package com.technokratos.analyticsservice.service;
 
-import com.technokratos.analyticsservice.client.BookingClient;
 import com.technokratos.analyticsservice.dto.FeedbackModerationEvent;
+import com.technokratos.analyticsservice.client.BookingClient;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component
@@ -14,16 +13,21 @@ public class FeedbackModerationConsumer {
     @Autowired
     private BookingClient bookingClient;
 
-    private static final List<String> BLACKLIST = List.of("яблоко");
+    private static final List<String> BLACKLIST = List.of("яндекс", "афиша", "отстой", "мошенники", "плохо");
 
+    // Слушаем СТРОГО очередь модерации отзывов
     @RabbitListener(queues = "feedback.moderation.queue")
     public void moderateFeedback(FeedbackModerationEvent event) {
-        System.out.println("[Analytics] Получен новый отзыв на проверку контента ID: " + event.getFeedbackId());
+        if (event == null || event.getFeedbackId() == null || event.getText() == null) {
+            System.err.println("⚠️ [Analytics] Получен отзыв с пустыми данными!");
+            return;
+        }
+
+        System.out.println("String.format(\"💬 [Analytics] Проверка отзыва ID %d: %s\", event.getFeedbackId(), event.getText()));");
 
         String textLowerCase = event.getText().toLowerCase();
         boolean isToxic = false;
 
-        // проверка на запретные слова
         for (String badWord : BLACKLIST) {
             if (textLowerCase.contains(badWord)) {
                 isToxic = true;
@@ -31,7 +35,6 @@ public class FeedbackModerationConsumer {
             }
         }
 
-        // проверка на крик
         if (event.getText().equals(event.getText().toUpperCase()) && event.getText().length() > 5) {
             isToxic = true;
         }
@@ -39,11 +42,10 @@ public class FeedbackModerationConsumer {
         String finalStatus = isToxic ? "REJECTED" : "APPROVED";
 
         try {
-            // возврат обратно
             bookingClient.updateFeedbackStatus(event.getFeedbackId(), finalStatus);
-            System.out.println("[Analytics] Отзыв ID " + event.getFeedbackId() + " проверен. Вердикт: " + finalStatus);
+            System.out.println("🤖 [Analytics] Отзыв ID " + event.getFeedbackId() + " проверен. Статус: " + finalStatus);
         } catch (Exception e) {
-            System.err.println("Не удалось отправить статус модерации через Feign: " + e.getMessage());
+            System.err.println("Ошибка отправки статуса модерации: " + e.getMessage());
         }
     }
 }

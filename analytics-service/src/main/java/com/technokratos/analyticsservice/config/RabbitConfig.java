@@ -10,10 +10,16 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
 
     public static final String QUEUE_NAME = "event.activity.queue";
+    public static final String FEEDBACK_QUEUE = "feedback.moderation.queue";
 
     @Bean
     public Queue activityQueue() {
         return new Queue(QUEUE_NAME, true);
+    }
+
+    @Bean
+    public Queue feedbackQueue() {
+        return new Queue(FEEDBACK_QUEUE, true); // Теперь analytics-service сам создаст её, если брокер пустой!
     }
 
     @Bean
