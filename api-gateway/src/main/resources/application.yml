@@ -23,7 +23,7 @@ spring:
         - id: booking-service-docs
           uri: http://localhost:8082
           predicates:
-            - Path=/booking-service/v3/api-docs/**
+            - Path=/booking-service/v3/api-docs,/booking-service/v3/api-docs/**
           filters:
             - RewritePath=/booking-service/(?<remaining>.*),/${remaining}
 
