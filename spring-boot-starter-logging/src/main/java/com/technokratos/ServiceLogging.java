@@ -11,21 +11,31 @@ import java.util.Arrays;
 
 @Aspect
 public class ServiceLogging {
-    private  static final Logger logger = LoggerFactory.getLogger("logging");
+    private  static final Logger log = LoggerFactory.getLogger("logging");
     private final LoggingProperties properties;
 
     public ServiceLogging(LoggingProperties properties) {
         this.properties = properties;
     }
 
-    @Around("execution(* com..technokratos..*Service.*(..))")
+    @Around("within(@org.springframework.stereotype.Service *)")
     public Object logService(ProceedingJoinPoint joinPoint) throws Throwable {
+        String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
+        String methodName = joinPoint.getSignature().getName();
+
+        log.info("[SERVICE] {}.{}() - Запуск", className, methodName);
+
         long start = System.currentTimeMillis();
-        Object result = joinPoint.proceed();
-        long duration = System.currentTimeMillis() - start;
-        logger.debug("{} {} --- {} {} : Parameters = {} and result = {} {}ms", Instant.now(), "DEBUG",
-                properties.getModule(), joinPoint.getSignature().getDeclaringTypeName(),
-                Arrays.toString(joinPoint.getArgs()), result, duration);
-        return result;
+        try {
+            Object result = joinPoint.proceed();
+            long executionTime = System.currentTimeMillis() - start;
+
+            log.info("[SERVICE] {}.{}() - Выполнено ({} мс)", className, methodName, executionTime);
+            return result;
+        } catch (Exception e) {
+            long executionTime = System.currentTimeMillis() - start;
+            log.error("[SERVICE] {}.{}() - ОШИБКА ({} мс). Причина: {}", className, methodName, executionTime, e.getMessage());
+            throw e;
+        }
     }
 }
