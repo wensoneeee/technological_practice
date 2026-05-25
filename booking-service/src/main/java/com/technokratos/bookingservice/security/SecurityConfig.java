@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/internal/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/css/**", "/js/**", "/image/**", "/*.css").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/image/**", "/*.css", "/home").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(securityHeaderFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

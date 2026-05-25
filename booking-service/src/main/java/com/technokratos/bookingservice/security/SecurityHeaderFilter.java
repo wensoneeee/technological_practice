@@ -21,18 +21,14 @@ public class SecurityHeaderFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
 
-        String userIdHeader = request.getHeader("X-User-Id");
+        String userEmailHeader = request.getHeader("X-User-Email");
         String userRoleHeader = request.getHeader("X-User-Role");
 
-        if (userIdHeader != null && !userIdHeader.isBlank()) {
+        if (userEmailHeader != null && !userEmailHeader.isBlank()) {
             String role = (userRoleHeader != null && !userRoleHeader.isBlank()) ? userRoleHeader : Role.ROLE_USER.name();
 
-            if (!role.startsWith("ROLE_")) {
-                role = "ROLE_" + role;
-            }
-
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userIdHeader, null, Collections.singletonList(new SimpleGrantedAuthority(role))
+                    userEmailHeader, null, Collections.singletonList(new SimpleGrantedAuthority(role))
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

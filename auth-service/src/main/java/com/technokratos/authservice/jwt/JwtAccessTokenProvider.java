@@ -48,7 +48,7 @@ public class JwtAccessTokenProvider {
         String role = claims.get("role", String.class);
 
         AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setId(claims.get("id", Long.class));
+        accountResponse.setId(((Number) claims.get("id")).longValue());
         accountResponse.setEmail(email);
         accountResponse.setRole(Role.valueOf(role));
         return accountResponse;

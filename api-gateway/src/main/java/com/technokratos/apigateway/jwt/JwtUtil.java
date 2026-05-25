@@ -21,11 +21,11 @@ public class JwtUtil {
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
 
-    public String extractId(String token) {
+    public String extractEmail(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build()
                 .parseClaimsJws(token).getBody();
-        Object id = claims.get("id");
-        return id != null ? id.toString() : null;
+        Object email = claims.getSubject();
+        return email != null ? email.toString() : null;
     }
 
     public String extractRole(String token) {
@@ -36,7 +36,6 @@ public class JwtUtil {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 }

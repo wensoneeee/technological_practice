@@ -49,13 +49,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 //парсим JWT и проверяем его подпись через JwtUtil
                 jwtUtil.validateToken(token);
 
-                String userId = jwtUtil.extractId(token);
+                String userEmail = jwtUtil.extractEmail(token);
                 String role = jwtUtil.extractRole(token);
 
                 // "подменяем" запрос, добавляя заголовки, которые увидят наши микросервисы
                 request = exchange.getRequest()
                         .mutate()
-                        .header("X-User-Id", userId)
+                        .header("X-User-Email", userEmail)
                         .header("X-User-Role", role)
                         .build();
             } catch (Exception e) {
