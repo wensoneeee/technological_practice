@@ -1,8 +1,11 @@
 package com.technokratos.bookingservice.service.classes;
 
+import com.technokratos.bookingservice.config.RabbitConfig;
+import com.technokratos.bookingservice.dto.event.FeedbackModerationEvent;
 import com.technokratos.bookingservice.mapper.FeedbackMapper;
 import com.technokratos.bookingservice.repository.jooq.PurchaseJooqRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -16,7 +19,6 @@ import com.technokratos.bookingservice.models.PurchaseItem;
 import com.technokratos.bookingservice.models.User;
 import com.technokratos.bookingservice.repository.jpa.EventRepository;
 import com.technokratos.bookingservice.repository.jpa.FeedbackRepository;
-import com.technokratos.bookingservice.repository.jpa.PurchaseRepository;
 import com.technokratos.bookingservice.repository.jpa.UserRepository;
 import com.technokratos.bookingservice.service.interfaces.FeedbackService;
 
@@ -32,9 +34,9 @@ public class FeedbackServiceImpl implements FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
-    private final PurchaseRepository purchaseRepository;
     private final FeedbackMapper feedbackMapper;
     private final PurchaseJooqRepository purchaseJooqRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public FeedbackDto getFeedbackByUserIdAndEventId(Long userId, Long eventId) {
@@ -56,14 +58,26 @@ public class FeedbackServiceImpl implements FeedbackService {
 
         feedback.setUserFeedback(user);
         feedback.setEventFeedback(event);
+        feedback.setStatus("PENDING");
         feedback.setConfirmed(purchaseJooqRepository.didUserBoughtTicket(form.getEventId(), form.getUserId()));
         feedbackRepository.save(feedback);
+
+        try {
+            FeedbackModerationEvent fme = FeedbackModerationEvent.builder()
+                    .feedbackId(feedback.getFeedbackId())
+                    .text(feedback.getText())
+                    .build();
+
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, fme);
+        } catch (Exception e) {
+            System.err.println("Ошибка отправки отзыва в брокер: " + e.getMessage());
+        }
     }
 
     @Override
     @Cacheable(value = "feedbacks", key = "#eventId")
     public List<FeedbackEventDto> findCommentsByEventId(Long eventId) {
-        return feedbackRepository.findFeedbacksByEventFeedback_EventId(eventId).stream()
+        return feedbackRepository.findFeedbackByEventFeedback_EventIdAndStatus(eventId, "APPROVED").stream()
                 .map(feedbackMapper::toEventDto)
                 .collect(Collectors.toList());
     }

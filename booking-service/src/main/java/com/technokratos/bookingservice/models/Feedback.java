@@ -28,6 +28,7 @@ public class Feedback {
     private Event eventFeedback;
 
     private String text;
+    private String status;
 
     @Range(min = 1, max = 5)
     private Integer score;

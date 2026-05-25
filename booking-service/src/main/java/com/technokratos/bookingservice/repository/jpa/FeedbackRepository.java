@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     Optional<Feedback> findFeedbackByEventFeedback_EventIdAndUserFeedback_UserId(Long eventId, Long userId);
-    List<Feedback> findFeedbacksByEventFeedback_EventId(Long eventFeedbackEventId);
+    List<Feedback> findFeedbackByEventFeedback_EventIdAndStatus(Long eventFeedbackEventId, String status);
 
     @Query("select avg(score) from Feedback " +
             "where eventFeedback.eventId=:eventFeedbackEventId")

@@ -43,6 +43,7 @@
 
             if (response.ok) {
                 messageDiv.innerText = 'Успешно!';
+                window.location.href = `${GATEWAY_URL}/home`;
 
                 // Сохраняем в LocalStorage для удобства
                 localStorage.setItem('accessToken', data.accessToken);
@@ -52,7 +53,7 @@
 
                 // Перенаправление на корень вашего гейтвея
                 setTimeout(() => {
-                    window.location.href = `${GATEWAY_URL}/`;
+                    window.location.href = `${GATEWAY_URL}/home`;
                 }, 500);
 
             } else {

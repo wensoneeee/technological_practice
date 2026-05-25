@@ -4,6 +4,7 @@ import com.technokratos.bookingservice.dto.dtos.EventDto;
 import com.technokratos.bookingservice.dto.forms.EventForm;
 import com.technokratos.bookingservice.models.PurchaseItem;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface EventService {
@@ -15,4 +16,6 @@ public interface EventService {
     void updateAvailableTickets(List<PurchaseItem> purchaseItems);
 
     void changeEventPhoto(Long photoId, Long eventId);
+
+    void updateCost(Long eventId, BigDecimal cost);
 }
