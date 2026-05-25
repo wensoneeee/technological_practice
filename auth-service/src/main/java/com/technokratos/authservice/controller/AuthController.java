@@ -3,6 +3,9 @@ package com.technokratos.authservice.controller;
 import com.technokratos.authservice.dto.*;
 import com.technokratos.authservice.jwt.JwtAccessTokenProvider;
 import com.technokratos.authservice.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +14,15 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Auth Controller", description = "Методы аутентификации и регистрации")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtAccessTokenProvider jwtAccessTokenProvider;
 
     @PostMapping("/sign-up")
+    @Operation(summary = "Регистрация нового пользователя", description = "Создает аккаунт в системе")
+    @ApiResponse(responseCode = "200", description = "Успешная регистрация")
     public ResponseEntity<AuthResponse> register(@RequestBody SignUpRequest request) {
         AuthResponse response = authService.signUp(
                 request.getEmail(),
@@ -28,6 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Авторизация", description = "Возвращает JWT токен")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
         AuthResponse authResponse = authService.login(request.getEmail(), request.getPassword());
 
@@ -40,6 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Выход из аккаунта")
     public ResponseEntity<String> logout(@RequestBody RefreshRequest request) {
         authService.logout(request.getRefreshToken());
         return ResponseEntity.ok("Вы успешно вышли из системы");

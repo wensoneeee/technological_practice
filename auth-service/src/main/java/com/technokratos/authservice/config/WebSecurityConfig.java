@@ -21,7 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private static final String[] PERMIT_ALL_URLS = {"/api/v1/auth/**", "/error", "/v3/api-docs"};
+    private static final String[] PERMIT_ALL_URLS = {"/api/v1/auth/**", "/error",
+            "/v3/api-docs/**", "/swagger-ui/**"};
 
     private final JwtTokenFilter jwtTokenFilter;
 
@@ -29,7 +30,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(CsrfConfigurer::disable)
-                .cors(CorsConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
