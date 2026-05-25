@@ -47,7 +47,6 @@ public class PurchaseServiceImpl implements PurchaseService {
         cartItemService.deleteAllByUserId(userId);
         eventService.updateAvailableTickets(purchaseItems);
         purchaseItemService.saveAll(purchaseItems);
-        feedbackService.updateWasThere(purchaseItems, userId);
         purchase.setTotalPrice(
                 purchaseItems.stream().map(PurchaseItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add)
         );
