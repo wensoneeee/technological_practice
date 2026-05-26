@@ -17,14 +17,21 @@ public class EnterController {
 
     private final AuthService authService;
 
-    @GetMapping("/api/v1/auth/come-in")
+    @GetMapping("/sign-in")
     @Operation(summary = "Получение страницы входа", description = "Возвращает HTML-страницу авторизации")
-    @ApiResponse(responseCode = "200", description = "HTML-страница загружена",
+    @ApiResponse(responseCode = "200", description = "HTML-страницу загружена",
             content = @Content(mediaType = "text/html"))
     public String comeIn(Model model) {
         model.addAttribute("GATEWAY_URL", "http://localhost:8080");
-        return "auth_page";
+        return "sign_in_page";
     }
 
-    // здесь еще надо регистрацию страницу прорисовать да?
+    @GetMapping("/sign-up")
+    @Operation(summary = "Получение страницы регистрации", description = "Возвращает HTML-страницу регистрации")
+    @ApiResponse(responseCode = "200", description = "HTML-страница регистрации загружена",
+            content = @Content(mediaType = "text/html"))
+    public String goToSignUp(Model model) {
+        model.addAttribute("GATEWAY_URL", "http://localhost:8080");
+        return "sign_up_page";
+    }
 }
