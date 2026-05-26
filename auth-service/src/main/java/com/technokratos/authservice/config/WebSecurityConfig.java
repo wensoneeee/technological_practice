@@ -26,7 +26,7 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private static final String[] PERMIT_ALL_URLS = {"/api/v1/auth/**", "/error",
-            "/v3/api-docs/**", "/swagger-ui/**"};
+            "/v3/api-docs/**", "/swagger-ui/**", "/sign-in", "/sign-up"};
 
     private final JwtTokenFilter jwtTokenFilter;
 

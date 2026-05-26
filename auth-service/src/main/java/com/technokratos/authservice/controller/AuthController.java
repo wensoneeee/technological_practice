@@ -51,7 +51,8 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Успешный вход в систему",
                     content = @Content(schema = @Schema(implementation = AuthResponse.class))),
             @ApiResponse(responseCode = "401", description = "Неверный логин или пароль")
-    })    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
+    })
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
         AuthResponse authResponse = authService.login(request.getEmail(), request.getPassword());
 
         Cookie cookie = new Cookie("JWT", authResponse.getAccessToken());
@@ -70,8 +71,20 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Пользователь успешно вышел из системы"),
             @ApiResponse(responseCode = "400", description = "Передан невалидный или отсутствующий Refresh-токен")
-    })    public ResponseEntity<String> logout(@RequestBody RefreshRequest request) {
+    })
+    public ResponseEntity<String> logout(@RequestBody RefreshRequest request) {
         authService.logout(request.getRefreshToken());
         return ResponseEntity.ok("Вы успешно вышли из системы");
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("JWT", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
     }
 }

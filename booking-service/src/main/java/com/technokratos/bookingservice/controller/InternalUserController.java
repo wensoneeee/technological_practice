@@ -4,7 +4,9 @@ import com.technokratos.bookingservice.models.Feedback;
 import com.technokratos.bookingservice.models.Role;
 import com.technokratos.bookingservice.models.User;
 import com.technokratos.bookingservice.repository.jpa.FeedbackRepository;
+import com.technokratos.bookingservice.repository.jpa.ImageRepository;
 import com.technokratos.bookingservice.repository.jpa.UserRepository;
+import com.technokratos.bookingservice.service.interfaces.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,6 +29,8 @@ public class InternalUserController {
 
     private final UserRepository userRepository;
     private final FeedbackRepository feedbackRepository;
+    private final ImageService imageService;
+    private final ImageRepository imageRepository;
 
     @PostMapping("/api/v1/internal/users")
     @Operation(
@@ -42,6 +46,7 @@ public class InternalUserController {
                 .email(email)
                 .name(name)
                 .role(role)
+                .image(imageRepository.getReferenceById(1L))
                 .build();
         userRepository.save(user);
         return ResponseEntity.ok().build();
