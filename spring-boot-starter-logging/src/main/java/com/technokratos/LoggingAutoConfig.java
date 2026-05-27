@@ -42,4 +42,9 @@ public class LoggingAutoConfig {
     public ControllerLogging controllerLoggingAspect(LoggingProperties properties) {
         return new ControllerLogging(properties);
     }
+
+    @Bean
+    public ComponentLogging componentLoggingAspect(LoggingProperties properties) {
+        return new ComponentLogging(properties);
+    }
 }

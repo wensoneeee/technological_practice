@@ -12,11 +12,6 @@ import java.util.Arrays;
 @Aspect
 public class ServiceLogging {
     private  static final Logger log = LoggerFactory.getLogger("logging");
-    private final LoggingProperties properties;
-
-    public ServiceLogging(LoggingProperties properties) {
-        this.properties = properties;
-    }
 
     @Around("within(@org.springframework.stereotype.Service *)")
     public Object logService(ProceedingJoinPoint joinPoint) throws Throwable {

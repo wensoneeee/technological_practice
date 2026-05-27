@@ -13,13 +13,6 @@ import java.util.Arrays;
 public class RepositoryLogging {
     private static final Logger log = LoggerFactory.getLogger("logging");
 
-    private final LoggingProperties properties;
-
-    public RepositoryLogging(LoggingProperties properties) {
-        this.properties = properties;
-    }
-
-
     @Around("within(@org.springframework.stereotype.Repository *)")
     public Object logRepository(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringType().getSimpleName();

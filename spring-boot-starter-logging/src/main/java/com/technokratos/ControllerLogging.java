@@ -13,12 +13,6 @@ public class ControllerLogging {
 
     private  static final Logger log = LoggerFactory.getLogger("logging");
 
-    private final LoggingProperties properties;
-
-    public ControllerLogging(LoggingProperties properties) {
-        this.properties = properties;
-    }
-
     @Around("within(@org.springframework.stereotype.Controller *)")
     public Object logController(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
