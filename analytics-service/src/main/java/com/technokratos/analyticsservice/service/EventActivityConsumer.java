@@ -27,9 +27,9 @@ public class EventActivityConsumer {
 
     @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
     public void handleEventActivity(EventActivityEvent activityEvent) {
-        // 🛑 ДОБАВЛЯЕМ КРИТИЧЕСКИ ВАЖНУЮ ЗАЩИТУ:
+        // ДОБАВЛЯЕМ КРИТИЧЕСКИ ВАЖНУЮ ЗАЩИТУ:
         if (activityEvent == null || activityEvent.getEventId() == null) {
-            System.err.println("⚠️ [Analytics] Получено пустое событие активности или eventId равен null! Пропускаем.");
+            System.err.println("[Analytics] Получено пустое событие активности или eventId равен null! Пропускаем.");
             return; // Безопасно выходим из метода, не ломая ConcurrentHashMap
         }
 
