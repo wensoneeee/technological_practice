@@ -72,34 +72,6 @@ public class AuthService {
         return generateTokens(user);
     }
 
-    public AccountResponse validateAndGetAccount(String token) {
-        if (jwtAccessTokenProvider.validateToken(token)) {
-            return jwtAccessTokenProvider.getUserInfoByToken(token);
-        }
-        throw new RuntimeException("Некорректный токен");
-    }
-
-    public AuthResponse refresh(String oldRefreshToken) {
-        RefreshToken refreshToken= refreshTokenRepository.findByToken(oldRefreshToken)
-                .orElseThrow(() -> new RuntimeException("Refresh-token не найден"));
-
-        if (refreshToken.isRevoked()) {
-            throw new RuntimeException("токен уже был отозван");
-        }
-
-        if (refreshToken.getExpDate().isBefore(Instant.now())) {
-            refreshTokenRepository.delete(refreshToken);
-            throw new RuntimeException("срок действия refresh-токена истек");
-        }
-
-        User user = refreshToken.getUser();
-
-        refreshToken.setRevoked(true);
-        refreshTokenRepository.save(refreshToken);
-
-        return generateTokens(user);
-    }
-
     public void logout(String refreshToken) {
         refreshTokenRepository.findByToken(refreshToken)
                 .ifPresent(token -> {
