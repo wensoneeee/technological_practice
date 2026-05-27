@@ -71,7 +71,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .text(emailText)
                 .build();
 
-        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, emailEvent);
+        rabbitTemplate.convertAndSend(RabbitConfig.EMAIL_EXCHANGE, RabbitConfig.EMAIL_ROUTING_KEY, emailEvent);
 
     }
 }
