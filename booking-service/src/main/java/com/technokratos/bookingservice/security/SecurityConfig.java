@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/internal/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/css/**", "/js/**", "/image/**", "/*.css", "/home").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/image/**", "/*.css", "/error", "/error/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(securityHeaderFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -1,8 +1,11 @@
 package com.technokratos.authservice.controller;
 
 import com.technokratos.authservice.dto.*;
+import com.technokratos.authservice.exception.ValidationException;
 import com.technokratos.authservice.jwt.JwtAccessTokenProvider;
 import com.technokratos.authservice.service.AuthService;
+import com.technokratos.authservice.validation.SignUpValidator;
+import com.technokratos.authservice.validation.Validation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final SignUpValidator signUpValidator;
 
     @PostMapping("/sign-up")
     @Operation(
@@ -34,6 +38,12 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Некорректные входные данные или email уже занят")
     })
     public ResponseEntity<AuthResponse> register(@RequestBody SignUpRequest request) {
+        Validation validation = signUpValidator.validate(request);
+
+        if (validation.hasErrors()) {
+            throw new ValidationException(validation);
+        }
+
         AuthResponse response = authService.signUp(
                 request.getEmail(),
                 request.getPassword(),
@@ -72,12 +82,22 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Пользователь успешно вышел из системы"),
             @ApiResponse(responseCode = "400", description = "Передан невалидный или отсутствующий Refresh-токен")
     })
+    @Deprecated
     public ResponseEntity<String> logout(@RequestBody RefreshRequest request) {
         authService.logout(request.getRefreshToken());
         return ResponseEntity.ok("Вы успешно вышли из системы");
     }
 
+
     @GetMapping("/logout")
+    @Operation(
+            summary = "Выход из системы (Logout)",
+            description = "Удаляет сессию пользователя, инвалидирует его Refresh-токен."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь успешно вышел из системы"),
+            @ApiResponse(responseCode = "400", description = "Передан невалидный или отсутствующий Refresh-токен")
+    })
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("JWT", null);
         cookie.setPath("/");
