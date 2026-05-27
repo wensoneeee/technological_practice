@@ -2,7 +2,6 @@ package com.technokratos.authservice.controller;
 
 import com.technokratos.authservice.dto.*;
 import com.technokratos.authservice.exception.ValidationException;
-import com.technokratos.authservice.jwt.JwtAccessTokenProvider;
 import com.technokratos.authservice.service.AuthService;
 import com.technokratos.authservice.validation.SignUpValidator;
 import com.technokratos.authservice.validation.Validation;

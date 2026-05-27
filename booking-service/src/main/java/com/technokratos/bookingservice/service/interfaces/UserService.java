@@ -1,9 +1,7 @@
 package com.technokratos.bookingservice.service.interfaces;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import com.technokratos.bookingservice.dto.forms.PasswordForm;
 import com.technokratos.bookingservice.dto.dtos.UserDto;
-import com.technokratos.bookingservice.dto.forms.UserForm;
 
 import java.util.List;
 
