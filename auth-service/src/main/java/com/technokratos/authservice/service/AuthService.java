@@ -53,8 +53,6 @@ public class AuthService {
             throw new RuntimeException("Не удалось создать профиль в booking-service", e);
         }
 
-
-
         return generateTokens(user);
     }
 
@@ -74,10 +72,26 @@ public class AuthService {
 
     public void logout(String refreshToken) {
         refreshTokenRepository.findByToken(refreshToken)
-                .ifPresent(token -> {
-                    token.setRevoked(true);
-                    refreshTokenRepository.save(token);
-                });
+                .ifPresent(token -> refreshTokenRepository.delete(token));
+    }
+
+    public AuthResponse refreshToken(String refreshToken) {
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new RuntimeException("Refresh token не найден"));
+
+        User user = token.getUser();
+        String newAccessToken = jwtAccessTokenProvider.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
+        String newRefreshToken = jwtRefreshTokenProvider.generateRefreshToken(user.getEmail());
+
+        refreshTokenRepository.delete(token);
+
+        RefreshToken newRefreshTokenEntity = new RefreshToken();
+        newRefreshTokenEntity.setToken(newRefreshToken);
+        newRefreshTokenEntity.setUser(user);
+
+        refreshTokenRepository.save(newRefreshTokenEntity);
+
+        return new AuthResponse(newAccessToken, newRefreshToken);
     }
 
     private AuthResponse generateTokens(User user) {
