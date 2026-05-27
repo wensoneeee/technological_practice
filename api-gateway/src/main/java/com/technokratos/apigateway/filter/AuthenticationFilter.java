@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.util.List;
 
 @Component
@@ -41,7 +42,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             String token = extractToken(request);
 
             if (token == null) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                exchange.getResponse().setStatusCode(HttpStatus.SEE_OTHER);
+                exchange.getResponse().getHeaders().setLocation(URI.create("/sign-in"));
                 return exchange.getResponse().setComplete();
             }
 
@@ -59,7 +61,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         .header("X-User-Role", role)
                         .build();
             } catch (Exception e) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                exchange.getResponse().setStatusCode(HttpStatus.SEE_OTHER);
+                exchange.getResponse().getHeaders().setLocation(URI.create("/sign-in"));
                 return exchange.getResponse().setComplete();
             }
             return chain.filter(exchange.mutate().request(request).build());

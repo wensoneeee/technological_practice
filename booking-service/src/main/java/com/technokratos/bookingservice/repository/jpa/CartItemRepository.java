@@ -22,6 +22,4 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     boolean existsCartItemByUserCartItemAndEventCartItem(User userCartItem, Event eventCartItem);
 
     CartItem findCartItemByUserCartItemAndEventCartItem(User user, Event event);
-
-    void deleteCartItemByEventCartItem_EventIdAndUserCartItem_UserId(Long eventCartItemEventId, Long userCartItemUserId);
 }

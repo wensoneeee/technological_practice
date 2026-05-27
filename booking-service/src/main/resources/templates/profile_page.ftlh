@@ -21,15 +21,7 @@
             <p><strong>Имя:</strong> ${user_data.name}</p>
             <p><strong>Email:</strong> ${user_data.email}</p>
             <p><strong>Роль:</strong> ${user_data.role}</p>
-            <hr>
-            <h4>Сменить пароль</h4>
-            <form action="/profile" method="post" class="form-group">
-                <input type="hidden" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
-                <input type="password" name="oldPassword" class="form-control" placeholder="Старый пароль" required>
-                <input type="password" name="newPassword" class="form-control" placeholder="Новый пароль" required>
-                <input type="password" name="confirmPassword" class="form-control" placeholder="Подтвердите пароль" required>
-                <input type="submit" value="Обновить пароль" class="btn" style="width: fit-content; margin-top: 10px;">
-            </form>
+
             <#if errors??>
                 <div class="text-danger"><#list errors as e><p>${e}</p></#list></div>
             </#if>

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.technokratos.bookingservice.dto.forms.CartItemForm;
@@ -57,5 +58,14 @@ public class CartController {
             model.addAttribute("totalPriceRub", totalPrice);
         }
         return "cart_page";
+    }
+
+    @PostMapping("/cart/delete/{id}")
+    @Operation(summary = "Удаление билета из корзины")
+    @ApiResponse(responseCode = "302", description = "Успешное удаление. Редирект обратно в корзину")
+    public String deleteFromCart(@PathVariable Long id) {
+        cartItemService.deleteCartItem(id);
+
+        return "redirect:/cart";
     }
 }

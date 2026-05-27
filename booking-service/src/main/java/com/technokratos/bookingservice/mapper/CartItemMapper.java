@@ -11,6 +11,7 @@ public interface CartItemMapper {
 
     @Mapping(source = "eventCartItem.title", target = "eventName")
     @Mapping(source = "pricePerUnit", target = "price")
+    @Mapping(source = "cartItemId", target = "id")
     @Mapping(target = "totalPrice", expression = "java(cartItem.getPricePerUnit().multiply(new java.math.BigDecimal(cartItem.getQuantity())))")
     CartItemDto toDto(CartItem cartItem);
 
