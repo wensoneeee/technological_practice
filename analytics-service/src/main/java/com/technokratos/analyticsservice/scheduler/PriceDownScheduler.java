@@ -3,7 +3,7 @@ package com.technokratos.analyticsservice.scheduler;
 import com.technokratos.analyticsservice.client.BookingClient;
 import com.technokratos.analyticsservice.model.EventStats;
 import com.technokratos.analyticsservice.service.EventActivityConsumer;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,13 +13,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class PriceDownScheduler {
 
-    @Autowired
-    private EventActivityConsumer activityConsumer;
+    private final EventActivityConsumer activityConsumer;
 
-    @Autowired
-    private BookingClient bookingClient;
+    private final BookingClient bookingClient;
 
     //проверка каждый час
     @Scheduled(fixedRate = 3600000)

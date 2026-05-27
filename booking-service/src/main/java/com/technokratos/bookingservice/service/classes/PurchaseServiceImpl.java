@@ -1,7 +1,9 @@
 package com.technokratos.bookingservice.service.classes;
 
 import com.technokratos.bookingservice.config.RabbitConfig;
+import com.technokratos.bookingservice.dto.event.EmailEvent;
 import com.technokratos.bookingservice.dto.event.EventActivityEvent;
+import com.technokratos.bookingservice.models.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -37,25 +39,39 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Transactional
     public void purchase(Long userId){
 
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         Purchase purchase = Purchase.builder()
-                .userPurchase(userRepository.findById(userId).orElseThrow(IllegalArgumentException::new))
+                .userPurchase(user)
                 .build();
 
         purchaseRepository.save(purchase);
         cartItemService.emptyCartForPurchase(userId);
+
         List<PurchaseItem> purchaseItems = purchaseItemService.transferCartItemToPurchaseItem(cartItemRepository.findCartItemsByUserCartItem_UserId(userId), purchase);
         cartItemService.deleteAllByUserId(userId);
         eventService.updateAvailableTickets(purchaseItems);
         purchaseItemService.saveAll(purchaseItems);
-        purchase.setTotalPrice(
-                purchaseItems.stream().map(PurchaseItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add)
-        );
+
+        BigDecimal totalPrice = purchaseItems.stream()
+                .map(PurchaseItem::getSubTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        purchase.setTotalPrice(totalPrice);
 
         for (PurchaseItem purchaseItem : purchaseItems) {
             EventActivityEvent purchaseEvent = new EventActivityEvent(purchaseItem.getEvent().getEventId(), "PURCHASE");
             rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, purchaseEvent);
         }
 
+        String userEmail = user.getEmail();
+        String emailText = String.format("Вы успешно приобрели билеты. Итоговая стоимость заказа: %f руб", totalPrice);
+
+        EmailEvent emailEvent = EmailEvent.builder()
+                .toEmail(userEmail)
+                .subject("Успешная покупка билетов!")
+                .text(emailText)
+                .build();
+
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, emailEvent);
 
     }
 }
