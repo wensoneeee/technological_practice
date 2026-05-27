@@ -1,6 +1,6 @@
 package com.technokratos.authservice.config;
 
-import com.technokratos.authservice.filter.JwtTokenFilter;
+import com.technokratos.authservice.filter.GatewayHeaderFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,10 +28,8 @@ public class WebSecurityConfig {
     private static final String[] PERMIT_ALL_URLS = {"/api/v1/auth/**", "/error", "/error/**",
             "/v3/api-docs/**", "/swagger-ui/**", "/sign-in", "/sign-up"};
 
-    private final JwtTokenFilter jwtTokenFilter;
-
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, GatewayHeaderFilter gatewayHeaderFilter) throws Exception {
         http
                 .csrf(CsrfConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -41,7 +39,7 @@ public class WebSecurityConfig {
                         .requestMatchers(PERMIT_ALL_URLS ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(gatewayHeaderFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -53,7 +51,7 @@ public class WebSecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://127.0.0.1:8080"));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

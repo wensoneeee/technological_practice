@@ -1,6 +1,7 @@
 package com.technokratos.apigateway.filter;
 
 import com.technokratos.apigateway.jwt.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpCookie;
@@ -18,7 +19,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     private final JwtUtil jwtUtil;
 
     private static final List<String> OPEN_ENDPOINTS = List.of(
-            "/auth/", "/api/v1/auth/", "/api/v1/auth/login", "/api/v1/auth/sign-up",
+            "/auth/", "/api/v1/auth/", "/api/v1/auth/login", "/api/v1/auth/sign-up", "/sign-in", "sign-up",
             "/swagger-ui/", "/booking-service/v3/api-docs", "/v3/api-docs", "/webjars/", "/v3/api-docs");
 
     public AuthenticationFilter(JwtUtil jwtUtil) {
@@ -48,18 +49,16 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             }
 
             try {
-                //парсим JWT и проверяем его подпись через JwtUtil
-                jwtUtil.validateToken(token);
+                Claims claims = jwtUtil.extractAllClaims(token);
+                String userEmail = claims.getSubject();
+                String role = claims.get("role", String.class);
 
-                String userEmail = jwtUtil.extractEmail(token);
-                String role = jwtUtil.extractRole(token);
-
-                // "подменяем" запрос, добавляя заголовки, которые увидят наши микросервисы
                 request = exchange.getRequest()
                         .mutate()
                         .header("X-User-Email", userEmail)
                         .header("X-User-Role", role)
                         .build();
+
             } catch (Exception e) {
                 exchange.getResponse().setStatusCode(HttpStatus.SEE_OTHER);
                 exchange.getResponse().getHeaders().setLocation(URI.create("/sign-in"));

@@ -17,22 +17,12 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    public void validateToken(String token) {
-        Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
-    }
-
-    public String extractEmail(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build()
-                .parseClaimsJws(token).getBody();
-        Object email = claims.getSubject();
-        return email != null ? email.toString() : null;
-    }
-
-    public String extractRole(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build()
-                .parseClaimsJws(token).getBody();
-        Object role = claims.get("role");
-        return role != null ? role.toString() : null;
+    public Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Key getSignKey() {

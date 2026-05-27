@@ -37,32 +37,4 @@ public class JwtAccessTokenProvider {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
-
-    public AccountResponse getUserInfoByToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        String email = claims.getSubject();
-        String role = claims.get("role", String.class);
-
-        AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setId(((Number) claims.get("id")).longValue());
-        accountResponse.setEmail(email);
-        accountResponse.setRole(Role.valueOf(role));
-        return accountResponse;
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
 }
