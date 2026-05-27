@@ -13,23 +13,29 @@ import java.util.Arrays;
 public class ServiceLogging {
     private  static final Logger log = LoggerFactory.getLogger("logging");
 
+    private final LoggingProperties loggingProperties;
+
+    public ServiceLogging(LoggingProperties loggingProperties) {
+        this.loggingProperties = loggingProperties;
+    }
+
     @Around("within(@org.springframework.stereotype.Service *)")
     public Object logService(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
 
-        log.info("[SERVICE] {}.{}() - Запуск", className, methodName);
+        log.info("[SERVICE] {}. Запуск метода {}()", className, methodName);
 
         long start = System.currentTimeMillis();
         try {
             Object result = joinPoint.proceed();
             long executionTime = System.currentTimeMillis() - start;
 
-            log.info("[SERVICE] {}.{}() - Выполнено ({} мс)", className, methodName, executionTime);
+            log.info("[SERVICE] {}.{}() Выполнено успешно ({} мс)", className, methodName, executionTime);
             return result;
         } catch (Exception e) {
-            long executionTime = System.currentTimeMillis() - start;
-            log.error("[SERVICE] {}.{}() - ОШИБКА ({} мс). Причина: {}", className, methodName, executionTime, e.getMessage());
+            log.error("[SERVICE] {}.{}() - Сбой за в сервисе. Причина: {}",
+                    className, methodName, e.getMessage());
             throw e;
         }
     }

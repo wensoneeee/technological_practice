@@ -103,9 +103,9 @@
                 <configuration>
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost:5432/shop_db</url>
+                        <url>jdbc:postgresql://localhost:5432/agona_project</url>
                         <user>postgres</user>
-                        <password>admin</password>
+                        <password>dilya2006</password>
                     </jdbc>
                     <generator>
                         <database>

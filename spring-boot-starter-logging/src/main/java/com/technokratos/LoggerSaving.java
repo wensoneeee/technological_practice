@@ -2,61 +2,37 @@ package com.technokratos;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import lombok.Setter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
+@Setter
 public class LoggerSaving extends AppenderBase<ILoggingEvent> {
 
     private LoggingProperties properties;
     private String filePath = "application.log";
-    private PrintWriter fileWriter;
-
-    public void setProperties(LoggingProperties properties) {
-        this.properties = properties;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     @Override
-    public void start() {
-        if ("file".equals(properties.getOutput())) {
-            try {
-                this.fileWriter = new PrintWriter(new BufferedWriter(
-                        new OutputStreamWriter(new FileOutputStream(filePath, true), StandardCharsets.UTF_8)));
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-                return;
-            }
-        }
-        super.start();
-    }
+    protected void append(ILoggingEvent event) {
+        if (event == null) return;
 
-    @Override
-    protected synchronized void append(ILoggingEvent event) {
-        if (!isStarted()) {
-            return;
-        }
+        String level = event.getLevel().toString();
 
-        String message = event.getFormattedMessage();
+        String timestamp = LocalDateTime.now().format(formatter);
 
-        if ("console".equals(properties.getOutput())) {
-            System.out.println(message);
-        } else {
-            fileWriter.println(message);
-            fileWriter.flush();
-        }
-    }
+        String logLine = String.format("%s [%s] %s - %s%n",
+                timestamp, level, event.getLoggerName(), event.getFormattedMessage());
 
-    @Override
-    public void stop() {
-        synchronized (this) {
-            if (fileWriter != null) {
-                fileWriter.close();
-            }
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(filePath, true), StandardCharsets.UTF_8))) {
+            writer.write(logLine);
+            writer.flush();
+        } catch (IOException e) {
+            addError("Ошибка записи в лог-файл", e);
         }
-        super.stop();
     }
 }

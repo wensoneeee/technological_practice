@@ -6,31 +6,32 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-
 @Aspect
 public class ControllerLogging {
 
     private  static final Logger log = LoggerFactory.getLogger("logging");
 
-    @Around("within(@org.springframework.stereotype.Controller *)")
+    private final LoggingProperties loggingProperties;
+
+    public ControllerLogging(LoggingProperties loggingProperties) {
+        this.loggingProperties = loggingProperties;
+    }
+    @Around("within(@org.springframework.web.bind.annotation.RestController *) || within(@org.springframework.stereotype.Controller *)")
     public Object logController(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        String args = Arrays.toString(joinPoint.getArgs());
 
-        log.info("[CONTROLLER] {}.{}() - Входящий запрос: {}", className, methodName, args);
+        log.info("[CONTROLLER] Входящий запрос в {}.{}()", className, methodName);
 
         long start = System.currentTimeMillis();
         try {
             Object result = joinPoint.proceed();
             long executionTime = System.currentTimeMillis() - start;
 
-            log.info("[CONTROLLER] {}.{}() - Успех ({} мс). Ответ: {}", className, methodName, executionTime, result);
+            log.info("[CONTROLLER] {}.{}() успешно вернул ответ ({} мс)", className, methodName, executionTime);
             return result;
-        } catch (Exception e) {
-            long executionTime = System.currentTimeMillis() - start;
-            log.error("[CONTROLLER] {}.{}() - ОШИБКА ({} мс). Причина: {}", className, methodName, executionTime, e.getMessage());
+        } catch (Throwable e) {
+            log.error("[CONTROLLER] Сбой в контроллере {}.{}(). Ошибка: {}", className, methodName, e.getMessage());
             throw e;
         }
     }
