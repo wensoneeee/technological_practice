@@ -17,4 +17,6 @@ public interface CartItemService {
     void emptyCartForPurchase(Long userId);
 
     void deleteAllByUserId(Long userId);
+
+    void deleteCartItem(Long eventId, Long userId);
 }

@@ -79,4 +79,9 @@ public class CartItemServiceImpl implements CartItemService {
     public void deleteAllByUserId(Long userId) {
         cartItemRepository.deleteAllByUserCartItem_UserId(userId);
     }
+
+    @Override
+    public void deleteCartItem(Long eventId, Long userId){
+        cartItemRepository.deleteCartItemByEventCartItem_EventIdAndUserCartItem_UserId(eventId, userId);
+    }
 }
