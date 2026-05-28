@@ -27,7 +27,6 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         this.jwtUtil = jwtUtil;
     }
 
-    // apply возвращает GatewayFilter, который Spring Gateway вызывает для каждого запроса
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
@@ -36,7 +35,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
             boolean isTokenRequired = OPEN_ENDPOINTS.stream()
                     .noneMatch(path::startsWith);
-            // пропускаем публ пути, где не нужен токен
+
             if (!isTokenRequired) {
                 return chain.filter(exchange);
             }
@@ -68,7 +67,6 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
         };
     }
 
-    // пытаемся найти токен в куках или заголовках
     private String extractToken(ServerHttpRequest request) {
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

@@ -1,5 +1,5 @@
 server:
-  port: 8080 # порт для гэйтвэй
+  port: 8080
 
 jwt:
   secret: ${JWT_SECRET}
@@ -39,7 +39,7 @@ spring:
           predicates:
             - Path=/**
           filters:
-            - AuthenticationFilter #кастомный фильтр для проверки jwt
+            - AuthenticationFilter
             - RewriteResponseHeader=Location, ^http://localhost:8082(.*), $1
 
 springdoc:
