@@ -11,36 +11,36 @@ spring:
     gateway:
       routes:
         - id: auth-service
-          uri: http://auth-service:8081
+          uri: http://localhost:8081
           predicates:
             - Path=/auth/**,/api/v1/auth/**,/sign-in,/sign-up
 
         - id: auth-service-docs
-          uri: http://auth-service:8081
+          uri: http://localhost:8081
           predicates:
             - Path=/auth-service/v3/api-docs
           filters:
-            - RewritePath=/auth-service/v3/api-docs, /v3/api-docs
+            - RewritePath=/auth-service/v3/api-docs,/v3/api-docs
 
         - id: booking-service-public
-          uri: http://booking-service:8082
+          uri: http://localhost:8082
           predicates:
             - Path=/css/**,/image/**,/js/**
 
         - id: booking-service-docs
-          uri: http://booking-service:8082
+          uri: http://localhost:8082
           predicates:
             - Path=/booking-service/v3/api-docs
           filters:
-            - RewritePath=/booking-service/v3/api-docs, /v3/api-docs
+            - RewritePath=/booking-service/v3/api-docs,/v3/api-docs
 
         - id: booking-service-protected
-          uri: http://booking-service:8082
+          uri: http://localhost:8082
           predicates:
             - Path=/**
           filters:
             - AuthenticationFilter
-            - RewriteResponseHeader=Location, ^http://booking-service:8082(.*), $1
+            - RewriteResponseHeader=Location, ^http://localhost:8082(.*), $1
 
 springdoc:
   swagger-ui:
@@ -50,3 +50,7 @@ springdoc:
 
       - name: Auth Service
         url: /auth-service/v3/api-docs
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG

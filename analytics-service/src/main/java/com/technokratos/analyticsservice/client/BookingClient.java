@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 
-@FeignClient(name = "booking-service", url = "http://booking-service:8082")
+@FeignClient(name = "booking-service", url = "http://localhost:8082")
 public interface BookingClient {
 
     @PutMapping("/api/v1/internal/events/{eventId}/price")
