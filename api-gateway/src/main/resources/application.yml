@@ -11,31 +11,31 @@ spring:
     gateway:
       routes:
         - id: auth-service
-          uri: http://localhost:8081
+          uri: http://auth-service:8081
           predicates:
             - Path=/auth/**,/api/v1/auth/**,/sign-in,/sign-up
 
         - id: auth-service-docs
-          uri: http://localhost:8081
+          uri: http://auth-service:8081
           predicates:
             - Path=/auth-service/v3/api-docs
           filters:
             - RewritePath=/auth-service/v3/api-docs, /v3/api-docs
 
         - id: booking-service-public
-          uri: http://localhost:8082
+          uri: http://booking-service:8082
           predicates:
             - Path=/css/**,/image/**,/js/**
 
         - id: booking-service-docs
-          uri: http://localhost:8082
+          uri: http://booking-service:8082
           predicates:
             - Path=/booking-service/v3/api-docs
           filters:
             - RewritePath=/booking-service/v3/api-docs, /v3/api-docs
 
         - id: booking-service-protected
-          uri: http://localhost:8082
+          uri: http://booking-service:8082
           predicates:
             - Path=/**
           filters:
