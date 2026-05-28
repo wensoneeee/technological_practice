@@ -31,7 +31,70 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres_composed
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: shop_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-multiple-databases.sql:/docker-entrypoint-initdb.d/init-multiple-databases.sql
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api_gateway_composed
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - booking-service
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth_service_composed
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+
+  booking-service:
+    build:
+      context: ./booking-service
+      dockerfile: Dockerfile
+    container_name: booking_service_composed
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - rabbitmq
+
+  analytics-service:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    container_name: analytics_service_composed
+    depends_on:
+      - rabbitmq
+
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification_service_composed
+    depends_on:
+      - rabbitmq
+
 volumes:
   redis_data:
   minio_data:
   rabbitmq_data:
+  postgres_data:

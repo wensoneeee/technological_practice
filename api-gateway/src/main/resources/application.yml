@@ -40,7 +40,7 @@ spring:
             - Path=/**
           filters:
             - AuthenticationFilter
-            - RewriteResponseHeader=Location, ^http://localhost:8082(.*), $1
+            - RewriteResponseHeader=Location, ^http://booking-service:8082(.*), $1
 
 springdoc:
   swagger-ui:
