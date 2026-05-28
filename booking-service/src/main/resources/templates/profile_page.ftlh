@@ -7,12 +7,12 @@
                 <img src="/image/${user_data.imageId}">
             </div>
             <form action="/img/profile/update" method="post" enctype="multipart/form-data" class="mt-20">
-                <input type="hidden" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
+                <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
                 <input type="file" name="file" class="form-control" required style="margin-bottom: 5px;">
                 <input type="submit" value="Загрузить" class="btn">
             </form>
             <form action="/img/profile/delete" method="post" class="mt-20">
-                <input type="hidden" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
+                <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
                 <input type="submit" value="Удалить фото" class="btn text-danger" style="background: #fee2e2;">
             </form>
         </div>

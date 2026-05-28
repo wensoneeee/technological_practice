@@ -18,7 +18,7 @@
 
         <h4>Добавить в корзину</h4>
         <form action="/cart/add" method="post" class="item-card">
-            <input type="hidden" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
+            <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
             <input type="hidden" name="eventId" value="${event.id}">
             <input type="hidden" name="price" value="${event.price}">
             <div class="form-group">
@@ -38,7 +38,7 @@
         <h3>Отзывы</h3>
 
         <form action="/event/${event.id}" method="post" class="item-card">
-            <input type="hidden" id="csrf" name="${(_csrf.parameterName)!' '}" value="${(_csrf.token)!' '}">
+            <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
             <input type="hidden" name="eventId" value="${event.id}">
             <div class="form-group">
                 <input type="text" name="text" class="form-control" placeholder="Введите комментарий" required>
