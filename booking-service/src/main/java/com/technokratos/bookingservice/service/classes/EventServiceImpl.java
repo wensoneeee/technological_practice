@@ -78,7 +78,7 @@ public class EventServiceImpl implements EventService {
                     .build();
             rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, eventActivityEvent);
         }catch (Exception e){
-            System.out.println("Не удалось отправить сообщение в Rabbit:"+e.getMessage());
+            throw new IllegalArgumentException("еррор сендинг евент ту рэббиt: " + e.getMessage());
         }
 
         return eventMapper.toDto(event);
@@ -100,7 +100,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public void updateAvailableTickets(List<PurchaseItem> purchaseItems) {
         for (PurchaseItem purchaseItem : purchaseItems) {
-            //делаем так ибо иначе может быть неверная информация(пусть этот способ и не очень эффективный)
             Event event = eventRepository.findById(purchaseItem.getEvent().getEventId()).orElseThrow(IllegalArgumentException::new);
             event.setAvailableTickets(event.getAvailableTickets() - purchaseItem.getQuantity());
             if (event.getAvailableTickets() < 0) {

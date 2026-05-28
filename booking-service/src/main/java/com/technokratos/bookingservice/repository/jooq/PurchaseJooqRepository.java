@@ -19,7 +19,7 @@ public class PurchaseJooqRepository {
                         .from(PURCHASE_ITEM)
                         .join(PURCHASE).on(PURCHASE_ITEM.PURCHASE_ID.eq(PURCHASE.PURCHASE_ID))
                         .where(PURCHASE_ITEM.EVENT_ID.eq(eventId))
-                        .and(PURCHASE.USER_ID.eq(userId)) // Убедись, что в PURCHASE есть колонка USER_ID
+                        .and(PURCHASE.USER_ID.eq(userId))
         );
     }
 }

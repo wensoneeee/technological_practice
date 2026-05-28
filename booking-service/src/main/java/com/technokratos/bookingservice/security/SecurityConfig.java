@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendRedirect("/come-in");
+                            response.sendRedirect("/sign-in");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.sendRedirect("/error/403");

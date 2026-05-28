@@ -28,24 +28,22 @@ public class RabbitConfig {
 
     @Bean
     public Queue activityQueue() {
-        return new Queue("event.activity.queue", true);
+        return new Queue(QUEUE_NAME, true);
     }
 
     @Bean
     public Queue feedbackQueue() {
-        return new Queue("feedback.moderation.queue", true);
+        return new Queue(FEEDBACK_QUEUE, true);
     }
 
-    // Аргументы должны называться ИМЕННО activityQueue и activityExchange
     @Bean
     public Binding activityBinding(Queue activityQueue, TopicExchange activityExchange) {
-        return BindingBuilder.bind(activityQueue).to(activityExchange).with("event.activity.click");
+        return BindingBuilder.bind(activityQueue).to(activityExchange).with(ROUTING_KEY);
     }
 
-    // Аргументы должны называться ИМЕННО feedbackQueue и feedbackExchange
     @Bean
     public Binding feedbackBinding(Queue feedbackQueue, TopicExchange feedbackExchange) {
-        return BindingBuilder.bind(feedbackQueue).to(feedbackExchange).with("feedback.moderation.validate");
+        return BindingBuilder.bind(feedbackQueue).to(feedbackExchange).with(FEEDBACK_ROUTING_KEY);
     }
 
     @Bean
@@ -55,7 +53,7 @@ public class RabbitConfig {
 
     @Bean
     public Queue emailQueue() {
-        return new Queue(EMAIL_QUEUE, true); // true означает durable (очередь переживет перезапуск RabbitMQ)
+        return new Queue(EMAIL_QUEUE, true);
     }
 
     @Bean

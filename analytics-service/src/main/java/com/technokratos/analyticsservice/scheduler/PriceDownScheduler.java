@@ -20,7 +20,6 @@ public class PriceDownScheduler {
 
     private final BookingClient bookingClient;
 
-    //проверка каждый час
     @Scheduled(fixedRate = 3600000)
     public void checkForInactivity() {
         LocalDateTime now = LocalDateTime.now();
@@ -30,19 +29,14 @@ public class PriceDownScheduler {
             Long eventId = entry.getKey();
             EventStats stats = entry.getValue();
 
-            // сколько часов прошло с последней активности
             long hoursPassed = ChronoUnit.HOURS.between(stats.getLastActivityTime(), now);
 
             if (hoursPassed >= 24) {
                 try {
                     bookingClient.updateEventPrice(eventId, BigDecimal.valueOf(-10));
-
-                    // чтобы цена не падала каждый час, записываем что цена уже изменена
                     stats.registerActivity();
-
-                    System.out.println("[Analytics] Цена на мероприятие " + eventId + " СНИЖЕНА на 10 руб. Из-за отсутствия спроса более 24 часов.");
                 } catch (Exception e) {
-                    System.err.println("Ошибка при автоматическом снижении цены: " + e.getMessage());
+                    throw new RuntimeException(e);
                 }
             }
         }

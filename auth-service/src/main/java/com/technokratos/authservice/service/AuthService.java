@@ -95,11 +95,6 @@ public class AuthService {
     }
 
     private AuthResponse generateTokens(User user) {
-        AccountResponse account = new AccountResponse();
-        account.setId(user.getId());
-        account.setEmail(user.getEmail());
-        account.setRole(user.getRole());
-
         String accessToken = jwtAccessTokenProvider.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
         String newRefreshToken = jwtRefreshTokenProvider.generateRefreshToken(user.getEmail());
 

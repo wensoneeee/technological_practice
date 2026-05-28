@@ -21,12 +21,4 @@ public interface UserMapper {
     @Mapping(target = "feedbacks", ignore = true)
     @Mapping(target = "purchases", ignore = true)
     User toEntity(UserForm form);
-
-    @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "image", ignore = true)
-    @Mapping(target = "cartItems", ignore = true)
-    @Mapping(target = "feedbacks", ignore = true)
-    @Mapping(target = "purchases", ignore = true)
-    void updateUserFromForm(UserForm form, @MappingTarget User user);
 }

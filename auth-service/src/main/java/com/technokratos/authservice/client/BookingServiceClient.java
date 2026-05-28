@@ -1,13 +1,10 @@
 package com.technokratos.authservice.client;
 
-
-
 import com.technokratos.authservice.entity.Role;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-// url пока указываем напрямую (порт букинга), потом заменим на имя в Eureka
 @FeignClient(name = "booking-service", url = "http://localhost:8082")
 public interface BookingServiceClient {
 

@@ -18,7 +18,7 @@ public interface CategoryMapper {
     @Mapping(source = "id", target = "categoryId")
     @Mapping(source = "name", target = "categoryName")
     @Mapping(source = "description", target = "categoryDescription")
-    @Mapping(target = "events", ignore = true) // Список мероприятий мы не передаем из формы
+    @Mapping(target = "events", ignore = true)
     Category toEntity(CategoryForm form);
 
     @Mapping(source = "id", target = "categoryId")

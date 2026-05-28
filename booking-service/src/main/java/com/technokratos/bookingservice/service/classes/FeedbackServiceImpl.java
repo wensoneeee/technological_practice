@@ -72,7 +72,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                     "feedback.moderation.validate",
                     fme);
         } catch (Exception e) {
-            System.err.println("Ошибка отправки отзыва в брокер: " + e.getMessage());
+            throw new IllegalArgumentException("ошибка отправление в рэббит: " + e.getMessage());
         }
     }
 

@@ -26,7 +26,7 @@ public class EventValidator {
         }
 
         if (form.getAvailableTickets() == null || form.getAvailableTickets() < 0) {
-            result.addError("rоличество билетов не может быть отрицательным");
+            result.addError("количество билетов не может быть отрицательным");
         }
 
         if (form.getPrice() == null || form.getPrice().compareTo(BigDecimal.ZERO) < 0) {

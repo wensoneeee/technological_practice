@@ -15,12 +15,7 @@ public class EmailNotificationConsumer {
 
     @RabbitListener(queues = RabbitConfig.NOTIFICATION_QUEUE)
     public void consumeEmailEvent(EmailEvent event) {
-        System.out.println("Получено сообщение из очереди для отправки письма");
 
-        emailSenderService.sendEmail(
-                event.getToEmail(),
-                event.getSubject(),
-                event.getText()
-        );
+        emailSenderService.sendEmail(event.getToEmail(), event.getSubject(), event.getText());
     }
 }

@@ -41,7 +41,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changeProfileImage(Long imageId, String email) {
-        System.out.println(email+ " " +imageId);
         User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
         user.setImage(imageRepository.findById(imageId).orElseThrow(IllegalArgumentException::new));
         userRepository.save(user);
@@ -49,7 +48,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteProfileImage(String email) {
-        System.out.println(email);
         User user = userRepository.findByEmail(email).orElseThrow(IllegalArgumentException::new);
         Long imageId = user.getImage().getImageId();
         user.setImage(imageRepository.findById(1L).orElseThrow(IllegalArgumentException::new));

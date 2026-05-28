@@ -15,15 +15,11 @@ public class FeedbackModerationConsumer {
 
     private static final List<String> BLACKLIST = List.of("яндекс", "афиша", "отстой", "мошенники", "плохо");
 
-    // Слушаем СТРОГО очередь модерации отзывов
     @RabbitListener(queues = "feedback.moderation.queue")
     public void moderateFeedback(FeedbackModerationEvent event) {
         if (event == null || event.getFeedbackId() == null || event.getText() == null) {
-            System.err.println("⚠️ [Analytics] Получен отзыв с пустыми данными!");
             return;
         }
-
-        System.out.println("String.format(\"💬 [Analytics] Проверка отзыва ID %d: %s\", event.getFeedbackId(), event.getText()));");
 
         String textLowerCase = event.getText().toLowerCase();
         boolean isToxic = false;
@@ -43,9 +39,8 @@ public class FeedbackModerationConsumer {
 
         try {
             bookingClient.updateFeedbackStatus(event.getFeedbackId(), finalStatus);
-            System.out.println("🤖 [Analytics] Отзыв ID " + event.getFeedbackId() + " проверен. Статус: " + finalStatus);
         } catch (Exception e) {
-            System.err.println("Ошибка отправки статуса модерации: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }
