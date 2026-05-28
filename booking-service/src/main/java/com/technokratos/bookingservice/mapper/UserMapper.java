@@ -5,7 +5,6 @@ import com.technokratos.bookingservice.dto.forms.UserForm;
 import com.technokratos.bookingservice.models.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
