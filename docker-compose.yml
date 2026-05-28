@@ -42,6 +42,7 @@ services:
       POSTGRES_PASSWORD: admin
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-multiple-databases.sql:/docker-entrypoint-initdb.d/init-multiple-databases.sql
 
   api-gateway:
     build:
