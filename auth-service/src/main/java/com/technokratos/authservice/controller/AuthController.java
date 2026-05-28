@@ -92,29 +92,16 @@ public class AuthController {
         return ResponseEntity.ok("Вы успешно вышли из системы");
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest request, HttpServletResponse response) {
+        AuthResponse authResponse = authService.refreshToken(request.getRefreshToken());
 
-    @GetMapping("/logout")
-    @Operation(
-            summary = "Выход из системы (Logout)",
-            description = "Удаляет сессию пользователя, инвалидирует его Refresh-токен."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Пользователь успешно вышел из системы"),
-            @ApiResponse(responseCode = "400", description = "Передан невалидный или отсутствующий Refresh-токен")
-    })
-    public ResponseEntity<Void> logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("JWT", null);
+        Cookie cookie = new Cookie("JWT", authResponse.getAccessToken());
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
+        cookie.setMaxAge(24 * 60 * 60);
         response.addCookie(cookie);
 
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/refresh")
-    @Operation(summary = "Обновление пары токенов")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest request) {
-        return ResponseEntity.ok(authService.refreshToken(request.getRefreshToken()));
+        return ResponseEntity.ok(authResponse);
     }
 }

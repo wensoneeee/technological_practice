@@ -17,7 +17,7 @@
                 <#if userRole == 'ROLE_ADMIN'>
                     <a href="/admin">Админ</a>
                 </#if>
-                <a href="${GATEWAY_URL!'http://localhost:8080'}/api/v1/auth/logout" id="logout-btn" class="btn">Выйти</a>
+                <button id="logout-btn" class="btn">Выйти</button>
             <#else>
                 <a href="/sign-in">Войти</a>
                 <a href="/register">Регистрация</a>
@@ -28,21 +28,24 @@
         <#nested>
     </main>
     <script>
-        document.getElementById('logout-btn').addEventListener('click', function(event) {
+        document.getElementById('logout-btn')?.addEventListener('click', function(event) {
             event.preventDefault();
 
             localStorage.removeItem('accessToken');
             document.cookie = "JWT=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-            fetch(`http://localhost:8080/api/v1/auth/logout`, {
-                method: 'GET'
+            fetch(`${GATEWAY_URL!'http://localhost:8080'}/api/v1/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
                 .then(() => {
-                    window.location.href = `http://localhost:8080/sign-in`;
+                    window.location.href = `/sign-in`;
                 })
                 .catch(err => {
-                    console.error("Ошибка при логауте на бэкенде, всё равно редиректим:", err);
-                    window.location.href = `http://localhost:8080/sign-in`;
+                    console.error("Ошибка при логауте:", err);
+                    window.location.href = `/sign-in`;
                 });
         });
     </script>
