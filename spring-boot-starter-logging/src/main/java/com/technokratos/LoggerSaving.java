@@ -2,17 +2,16 @@ package com.technokratos;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import lombok.Setter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Setter
 public class LoggerSaving extends AppenderBase<ILoggingEvent> {
 
     private LoggingProperties properties;
+
     private String filePath = "application.log";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
@@ -34,5 +33,13 @@ public class LoggerSaving extends AppenderBase<ILoggingEvent> {
         } catch (IOException e) {
             addError("Ошибка записи в лог-файл", e);
         }
+    }
+
+    public void setProperties(LoggingProperties properties) {
+        this.properties = properties;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

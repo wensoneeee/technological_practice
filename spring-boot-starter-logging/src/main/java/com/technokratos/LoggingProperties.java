@@ -1,14 +1,29 @@
 package com.technokratos;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Data
-@ConfigurationProperties(prefix = "logging")
+@ConfigurationProperties(prefix = "custom.logging")
 public class LoggingProperties {
 
-    private String level = "DEBUG";
-    private String output = "file";
-    private String module = "project";
-    private String filePath = "application.log";
+    private String filePath = "app.log";
+    private String level = "INFO";
+
+    public LoggingProperties() {
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
 }
