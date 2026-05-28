@@ -26,8 +26,7 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private static final String[] PERMIT_ALL_URLS = {"/api/v1/auth/**", "/error", "/error/**",
-            "/v3/api-docs/**", "/swagger-ui/**", "/sign-in", "/sign-up","/sign_up_page",
-            "/sign_in_page", "/static/css/style.css"};
+            "/v3/api-docs/**", "/swagger-ui/**", "/sign-in", "/sign-up"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, GatewayHeaderFilter gatewayHeaderFilter) throws Exception {

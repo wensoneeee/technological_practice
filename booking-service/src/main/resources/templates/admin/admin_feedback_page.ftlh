@@ -2,7 +2,7 @@
 <@layout.mainLayout title="Админ: Отзыв">
     <div class="info-box">
         <form action="/admin/feedback" method="get" class="flex-row">
-            <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
             <select name="selectedEventId" class="form-control">
                 <#list events as e><option value="${e.id}" <#if selectedFeedback?? && selectedFeedback.eventId == e.id>selected</#if>>${e.id}. ${e.title}</option></#list>
             </select>
@@ -15,7 +15,7 @@
 
     <#if selectedFeedback??>
         <form action="/admin/feedback/save" method="post" class="item-card">
-            <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
             <input type="hidden" name="userId" value="${selectedFeedback.userId}">
             <input type="hidden" name="eventId" value="${selectedFeedback.eventId}">
             <div class="form-group">

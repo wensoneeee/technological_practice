@@ -3,7 +3,7 @@
     <h3>Создать/изменить категорию</h3>
 
     <form action="/admin/category" method="get" class="info-box flex-row">
-        <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
         <select name="selectedCategoryId" class="form-control">
             <option value="">--создать новый--</option>
             <#list categories as c>
@@ -14,7 +14,7 @@
     </form>
 
     <form action="/admin/category" method="post" class="item-card">
-        <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
         <input type="hidden" name="id" value="${(selectedCategory.id)!''}">
         <div class="form-group"><input type="text" name="name" class="form-control" placeholder="название" value="${(selectedCategory.name)!''}" required></div>
         <div class="form-group"><input type="text" name="description" class="form-control" placeholder="описание" value="${(selectedCategory.description)!''}" required></div>
@@ -25,7 +25,7 @@
 
     <h3>Добавить событие к категории</h3>
     <form action="/admin/category/addEvent" method="post" class="item-card flex-row">
-        <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
         <select name="selectedEventId" class="form-control">
             <#list events as e><option value="${e.id}">${e.id}. ${e.title}</option></#list>
         </select>

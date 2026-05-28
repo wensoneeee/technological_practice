@@ -3,7 +3,7 @@
     <h3>Обновите или создайте пользователя</h3>
 
     <form action="/admin/user" method="get" class="info-box flex-row">
-        <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
         <select name="userId" class="form-control">
             <option value="">-- создать нового --</option>
             <#list users as u>
@@ -14,7 +14,7 @@
     </form>
 
     <form action="/admin/user/save" method="post" class="item-card">
-        <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
         <div class="form-group"><input type="email" name="email" class="form-control" value="${(selectedUser.email)!''}" placeholder="почта" required></div>
         <div class="form-group">
             <label>Пароль:</label>

@@ -16,13 +16,13 @@
                         Подытог: ${cartItem.totalPrice} руб.
 
                         <form action="/cart/delete/${cartItem.id}" method="post" style="margin-top: 10px;">
-                            <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
                             <input type="submit" value="Удалить" class="btn text-danger" style="background: #fee2e2; padding: 5px 10px;">
                         </form>
                     </div>
                 </#list>
                 <form action="/purchase" method="post">
-                    <input type="hidden" id="csrf" name="${_csrf.parameterName}" value="${_csrf.token}">
+
                     <input type="submit" value="Оформить покупку" class="btn">
                 </form>
             </div>
